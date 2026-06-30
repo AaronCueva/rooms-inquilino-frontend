@@ -25,7 +25,7 @@ class Router {
             $uri = str_replace($scriptName, '', $uri);
         }
 
-        // Si el URI contiene /index.php, lo removemos para el ruteo interno (útil para extensiones como PHP Server)
+        // Si el URI contiene /index.php, lo removemos para el ruteo interno
         if (str_ends_with($uri, '/index.php')) {
             $uri = substr($uri, 0, -10);
         } elseif ($uri === 'index.php') {
@@ -42,7 +42,6 @@ class Router {
             $controllerName = "App\\Controllers\\" . $this->routes[$method][$uri]['controller'];
             $action = $this->routes[$method][$uri]['action'];
 
-            // Se auto-carga el archivo usando el namespace (requiere autoload)
             $controllerFile = __DIR__ . '/../controllers/' . $this->routes[$method][$uri]['controller'] . '.php';
             if (file_exists($controllerFile)) {
                 require_once $controllerFile;

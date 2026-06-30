@@ -7,7 +7,7 @@ class Controller {
      * Renderiza una vista dentro de un layout.
      * @param string $view Ruta de la vista (ej. 'auth/login')
      * @param array $data Datos a pasar a la vista
-     * @param string $layout Plantilla base a usar (ej. 'auth', 'admin')
+     * @param string $layout Plantilla base a usar (ej. 'auth', 'main')
      */
     public function render($view, $data = [], $layout = 'main') {
         // Extraer variables para que estén disponibles en la vista
