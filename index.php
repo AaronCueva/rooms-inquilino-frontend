@@ -42,5 +42,8 @@ $router->get('/logout', 'AuthController', 'logout');
 // Rutas de Aplicación
 $router->get('/dashboard', 'DashboardController', 'index');
 
+// Rutas de API
+$router->get('/api/ubicaciones', 'UbicacionController', 'obtenerPorReferencia');
+
 // Despachar la ruta
 $router->dispatch();

@@ -89,7 +89,7 @@ class AuthController extends Controller
             $this->redirect('/dashboard');
         }
 
-        $tipos_documento = $this->catalogoModel->obtenerPorReferencia('CAT_TIPODOC');
+        $tipos_documento = $this->catalogoModel->obtenerPorReferencia('TIPO_DOCUMENTO');
         $departamentos = $this->ubicacionModel->obtenerDepartamentos();
         $universidades = $this->universidadModel->obtenerTodas();
 
