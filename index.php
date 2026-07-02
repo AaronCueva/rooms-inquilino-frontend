@@ -42,6 +42,15 @@ $router->get('/logout', 'AuthController', 'logout');
 // Rutas de Aplicación
 $router->get('/dashboard', 'DashboardController', 'index');
 
+// Rutas de Comunidad / Foros de Discusión Estudiantil
+$router->get('/foros', 'ForoController', 'index');
+$router->get('/foros/ver', 'ForoController', 'ver');
+$router->post('/foros/guardar', 'ForoController', 'guardar');
+$router->post('/foros/comentar', 'ForoController', 'comentar');
+$router->post('/foros/reaccionar', 'ForoController', 'reaccionarAjax');
+$router->post('/foros/eliminar', 'ForoController', 'eliminar');
+$router->post('/foros/eliminarComentario', 'ForoController', 'eliminarComentario');
+
 // Rutas de API
 $router->get('/api/ubicaciones', 'UbicacionController', 'obtenerPorReferencia');
 
