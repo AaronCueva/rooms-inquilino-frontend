@@ -124,39 +124,6 @@
                         </select>
                     </div>
                 </div>
-                
-                <h6 class="mt-4 mb-2 fw-bold" style="font-size: 0.9rem;">¿Dónde deseas buscar alojamiento?</h6>
-                <div class="col-md-6">
-                    <div class="field">
-                        <label>Departamento <span class="req">*</span></label>
-                        <select id="departamento" name="departamento" required onchange="cargarProvincias(this.value)">
-                            <option value="" selected disabled>Seleccione...</option>
-                            <?php if (isset($departamentos)): ?>
-                                <?php foreach ($departamentos as $dep): ?>
-                                    <option value="<?php echo htmlspecialchars($dep['ubicacion_id']); ?>">
-                                        <?php echo htmlspecialchars($dep['nombre']); ?>
-                                    </option>
-                                <?php endforeach; ?>
-                            <?php endif; ?>
-                        </select>
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="field">
-                        <label>Provincia <span class="req">*</span></label>
-                        <select id="provincia" name="provincia" required onchange="cargarDistritos(this.value)" disabled>
-                            <option value="" selected disabled>Seleccione...</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="col-md-12">
-                    <div class="field">
-                        <label>Distrito de preferencia <span class="req">*</span></label>
-                        <select id="distrito" name="distrito" required disabled>
-                            <option value="" selected disabled>Seleccione...</option>
-                        </select>
-                    </div>
-                </div>
             </div>
 
             <button type="submit" class="btn btn-primary btn-block w-100 mt-4">Crear mi cuenta</button>
@@ -233,61 +200,5 @@
         document.getElementById('reg-sub').textContent = subs[n];
     }
 
-    async function cargarProvincias(departamento_id) {
-        const provinciaSelect = document.getElementById('provincia');
-        const distritoSelect = document.getElementById('distrito');
 
-        provinciaSelect.innerHTML = '<option value="" selected disabled>Seleccione...</option>';
-        distritoSelect.innerHTML = '<option value="" selected disabled>Seleccione...</option>';
-        provinciaSelect.disabled = true;
-        distritoSelect.disabled = true;
-
-        if (!departamento_id) return;
-
-        try {
-            // Reusamos el endpoint de la API del admin, asumiendo que ambos usarán el mismo o expondremos uno
-            // Nota: En un caso real necesitaríamos que el endpoint esté disponible en esta app.
-            // Por simplicidad, asumimos que el admin está en el mismo host o lo crearemos luego.
-            // Para la demo del registro, esto es ilustrativo.
-            const response = await fetch('/api/ubicaciones?referencia_id=' + departamento_id);
-            const data = await response.json();
-
-            if (data.length > 0) {
-                data.forEach(provincia => {
-                    const option = document.createElement('option');
-                    option.value = provincia.ubicacion_id;
-                    option.textContent = provincia.nombre;
-                    provinciaSelect.appendChild(option);
-                });
-                provinciaSelect.disabled = false;
-            }
-        } catch (error) {
-            console.error('Error al cargar provincias:', error);
-        }
-    }
-
-    async function cargarDistritos(provincia_id) {
-        const distritoSelect = document.getElementById('distrito');
-        distritoSelect.innerHTML = '<option value="" selected disabled>Seleccione...</option>';
-        distritoSelect.disabled = true;
-
-        if (!provincia_id) return;
-
-        try {
-            const response = await fetch('/api/ubicaciones?referencia_id=' + provincia_id);
-            const data = await response.json();
-
-            if (data.length > 0) {
-                data.forEach(distrito => {
-                    const option = document.createElement('option');
-                    option.value = distrito.ubicacion_id;
-                    option.textContent = distrito.nombre;
-                    distritoSelect.appendChild(option);
-                });
-                distritoSelect.disabled = false;
-            }
-        } catch (error) {
-            console.error('Error al cargar distritos:', error);
-        }
-    }
 </script>
