@@ -90,12 +90,10 @@ class AuthController extends Controller
         }
 
         $tipos_documento = $this->catalogoModel->obtenerPorReferencia('TIPO_DOCUMENTO');
-        $departamentos = $this->ubicacionModel->obtenerDepartamentos();
         $universidades = $this->universidadModel->obtenerTodas();
 
         $this->render('auth/register', [
             'tipos_documento' => $tipos_documento,
-            'departamentos' => $departamentos,
             'universidades' => $universidades
         ], 'auth');
     }
@@ -111,6 +109,16 @@ class AuthController extends Controller
                  $this->redirect('/register');
             }
 
+            $universidad_id = filter_input(INPUT_POST, 'universidad_id', FILTER_SANITIZE_STRING);
+            $ubicacion_id = null;
+
+            if ($universidad_id) {
+                $universidad = $this->universidadModel->findById($universidad_id);
+                if ($universidad && isset($universidad['ubicacion_id'])) {
+                    $ubicacion_id = $universidad['ubicacion_id'];
+                }
+            }
+
             $datos = [
                 'nombres' => filter_input(INPUT_POST, 'nombres', FILTER_SANITIZE_STRING),
                 'apellido_paterno' => filter_input(INPUT_POST, 'apellido_paterno', FILTER_SANITIZE_STRING),
@@ -119,8 +127,8 @@ class AuthController extends Controller
                 'numero_documento' => filter_input(INPUT_POST, 'numero_documento', FILTER_SANITIZE_STRING),
                 'correo' => filter_input(INPUT_POST, 'correo', FILTER_SANITIZE_EMAIL),
                 'celular' => filter_input(INPUT_POST, 'celular', FILTER_SANITIZE_STRING),
-                'ubicacion_id' => filter_input(INPUT_POST, 'distrito', FILTER_SANITIZE_STRING), // El último nivel de la cascada
-                'universidad_id' => filter_input(INPUT_POST, 'universidad_id', FILTER_SANITIZE_NUMBER_INT),
+                'ubicacion_id' => $ubicacion_id,
+                'universidad_id' => $universidad_id,
                 'password' => $_POST['password'] ?? '',
                 'rol_id' => $rol_id
             ];

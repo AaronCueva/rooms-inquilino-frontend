@@ -53,14 +53,17 @@
                 </div>
 
                 <div class="nav-actions">
-                    <!-- Icono de redes sociales para inquilinos -->
-                    <button class="icon-btn"><i class="fas fa-users"></i></button>
+                    <!-- Icono de comunidad/foros para inquilinos -->
+                    <a href="/foros" class="icon-btn text-decoration-none d-flex align-items-center justify-content-center" title="Comunidad y Foros Universitarios" style="color: inherit;">
+                        <i class="fas fa-users"></i>
+                    </a>
                     <button class="icon-btn"><i class="fas fa-bell"></i><span class="dot"></span></button>
                     <div class="user-menu dropdown">
                         <div class="nav-avatar" data-bs-toggle="dropdown" aria-expanded="false" style="cursor: pointer;">
                             <?php echo $avatar_letras; ?>
                         </div>
                         <ul class="dropdown-menu dropdown-menu-end shadow animated--grow-in">
+                            <li><a class="dropdown-item" href="/foros"><i class="fas fa-users fa-sm fa-fw me-2 text-primary"></i> Comunidad Universitaria</a></li>
                             <li><a class="dropdown-item" href="/perfil"><i class="fas fa-user fa-sm fa-fw me-2 text-gray-400"></i> Perfil</a></li>
                             <li><hr class="dropdown-divider"></li>
                             <li><a class="dropdown-item" href="/logout"><i class="fas fa-sign-out-alt fa-sm fa-fw me-2 text-gray-400"></i> Cerrar sesión</a></li>
@@ -87,11 +90,59 @@
                     toast: true,
                     position: 'top-end',
                     showConfirmButton: false,
-                    timer: 3000,
-                    timerProgressBar: true
+                    timer: 3500,
+                    timerProgressBar: true,
+                    customClass: {
+                        popup: 'rounded-3 shadow-lg border-0'
+                    }
                 });
             <?php endif; ?>
         });
+
+        /**
+         * Función global para confirmar acciones destructivas o importantes con SweetAlert2
+         */
+        function confirmarAccionSweet(event, titulo, texto, icono = 'warning', textConfirm = '<i class="fas fa-check me-1"></i> Sí, continuar', btnColor = '#EF4444') {
+            event.preventDefault();
+            const form = event.target.closest('form') || event.target;
+            
+            Swal.fire({
+                title: titulo || '¿Estás seguro?',
+                text: texto || 'Esta acción no se puede deshacer.',
+                icon: icono,
+                showCancelButton: true,
+                confirmButtonColor: btnColor,
+                cancelButtonColor: '#64748B',
+                confirmButtonText: textConfirm,
+                cancelButtonText: 'Cancelar',
+                reverseButtons: true,
+                customClass: {
+                    popup: 'rounded-4 shadow-lg border-0',
+                    confirmButton: `btn ${btnColor === '#EF4444' ? 'btn-danger' : 'btn-primary'} px-4 py-2 rounded-pill fw-bold ms-2 shadow-sm`,
+                    cancelButton: 'btn btn-light px-4 py-2 rounded-pill fw-bold text-dark border'
+                },
+                buttonsStyling: false
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Mostrar indicador de carga en SweetAlert mientras se envía
+                    Swal.fire({
+                        title: 'Procesando...',
+                        text: 'Por favor espera un momento',
+                        allowOutsideClick: false,
+                        allowEscapeKey: false,
+                        showConfirmButton: false,
+                        didOpen: () => {
+                            Swal.showLoading();
+                        },
+                        customClass: {
+                            popup: 'rounded-4 shadow-lg border-0'
+                        }
+                    });
+                    form.submit();
+                }
+            });
+            return false;
+        }
     </script>
 </body>
 </html>

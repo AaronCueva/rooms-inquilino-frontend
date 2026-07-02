@@ -23,4 +23,11 @@ class UniversidadModel {
         $stmt->execute([':termino' => '%' . strtolower($termino) . '%']);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
+
+    public function findById($id) {
+        $query = "SELECT universidad_id, nombre, ubicacion_id FROM universidad WHERE universidad_id = :id AND habilitado = true LIMIT 1";
+        $stmt = $this->db->prepare($query);
+        $stmt->execute([':id' => $id]);
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
 }
