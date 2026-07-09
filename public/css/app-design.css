@@ -257,6 +257,7 @@
 .pd-marquee:hover .pd-marquee-track { animation-play-state: paused; }
 .pd-uni { display: inline-flex; align-items: center; gap: 10px; padding: 13px 22px; border: 1.5px solid var(--pd-line); border-radius: 999px; background: var(--pd-surface); font-weight: 600; font-size: 15px; white-space: nowrap; }
 .pd-uni i { color: var(--pd-primary); }
+.pd-uni-center { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 16px; max-width: 1100px; margin: 0 auto; padding: 0 20px; }
 @keyframes pd-marq { to { transform: translateX(-50%); } }
 
 /* ---------- Testimonials ---------- */
