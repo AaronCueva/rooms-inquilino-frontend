@@ -9,7 +9,7 @@ class Controller {
      * @param array $data Datos a pasar a la vista
      * @param string $layout Plantilla base a usar (ej. 'auth', 'main')
      */
-    public function render($view, $data = [], $layout = 'main') {
+    public function render($view, $data = [], $layout = 'public') {
         // Extraer variables para que estén disponibles en la vista
         extract($data);
 

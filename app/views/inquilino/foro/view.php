@@ -1,17 +1,17 @@
 <?php
-// Mapeo de íconos y colores por categoría de catálogo
+// Mapeo de íconos y colores por categoría de catálogo (paleta alineada al design system pd-*)
 $iconos_cat = [
-    'CATFR001' => ['icon' => 'fa-map-marked-alt', 'color' => '#4FCBDA', 'bg' => 'rgba(79, 203, 218, 0.15)', 'label' => '🗺️ Zonas'],
-    'CATFR002' => ['icon' => 'fa-user-friends',  'color' => '#7BA0F6', 'bg' => 'rgba(123, 160, 246, 0.15)', 'label' => '🤝 Roomies'],
-    'CATFR003' => ['icon' => 'fa-file-contract', 'color' => '#F0AE5C', 'bg' => 'rgba(240, 174, 92, 0.15)', 'label' => '⚖️ Contratos'],
-    'CATFR004' => ['icon' => 'fa-home',          'color' => '#E86E6E', 'bg' => 'rgba(232, 110, 110, 0.15)', 'label' => '🏠 Arrendadores'],
-    'CATFR005' => ['icon' => 'fa-store',         'color' => '#A07BF6', 'bg' => 'rgba(160, 123, 246, 0.15)', 'label' => '📦 Mercadillo'],
-    'CATFR006' => ['icon' => 'fa-graduation-cap','color' => '#4DDA8A', 'bg' => 'rgba(77, 218, 138, 0.15)', 'label' => '💡 Vida Uni'],
-    'CATFR007' => ['icon' => 'fa-bullhorn',      'color' => '#FF8040', 'bg' => 'rgba(255, 128, 64, 0.15)', 'label' => '📢 Soporte']
+    'CATFR001' => ['icon' => 'fa-map-marked-alt', 'color' => '#2A44FF', 'bg' => '#E9F0FF', 'label' => 'Zonas'],
+    'CATFR002' => ['icon' => 'fa-user-friends',  'color' => '#FF5A3C', 'bg' => '#FFE7DF', 'label' => 'Roomies'],
+    'CATFR003' => ['icon' => 'fa-file-contract', 'color' => '#1A2FB0', 'bg' => '#E9F0FF', 'label' => 'Contratos'],
+    'CATFR004' => ['icon' => 'fa-home',          'color' => '#FF5A3C', 'bg' => '#FFE7DF', 'label' => 'Arrendadores'],
+    'CATFR005' => ['icon' => 'fa-store',         'color' => '#2A44FF', 'bg' => '#E9F0FF', 'label' => 'Mercadillo'],
+    'CATFR006' => ['icon' => 'fa-graduation-cap','color' => '#16a34a', 'bg' => '#E8FB9E', 'label' => 'Vida Uni'],
+    'CATFR007' => ['icon' => 'fa-bullhorn',      'color' => '#FF5A3C', 'bg' => '#FFE7DF', 'label' => 'Soporte']
 ];
 
 $cod = $foro['categoria_codigo'];
-$cat_info = $iconos_cat[$cod] ?? ['icon' => 'fa-tag', 'color' => '#64748B', 'bg' => '#F1F5F9', 'label' => $foro['categoria_nombre'] ?? 'General'];
+$cat_info = $iconos_cat[$cod] ?? ['icon' => 'fa-tag', 'color' => '#6B6F7A', 'bg' => '#F1F5F9', 'label' => $foro['categoria_nombre'] ?? 'General'];
 $iniciales = strtoupper(substr($foro['nombres'] ?? 'U', 0, 1) . substr($foro['apellido_paterno'] ?? '', 0, 1));
 $es_mio = ($foro['usuario_id'] == $usuario_id);
 
@@ -38,45 +38,45 @@ if (!function_exists('renderizarComentario')) {
         // Limitar indentación máxima a 2 niveles de sangría (Nieto)
         $indent_rem = min($nivel, 2) * 2.5;
         ?>
-        <div class="comentario-item mb-3 transition-all" id="comentario-<?php echo $id; ?>" style="margin-left: <?php echo $indent_rem; ?>rem;">
-            <div class="card border-0 shadow-sm" style="border-radius: 12px; background: <?php echo ($nivel > 0) ? '#F8FAFC' : '#fff'; ?>; border-left: <?php echo ($nivel > 0) ? '3px solid #CBD5E1 !important' : 'none'; ?>;">
-                <div class="card-body p-3 p-md-4">
-                    <div class="d-flex justify-content-between align-items-center mb-2">
-                        <div class="d-flex align-items-center gap-2">
-                            <div class="rounded-circle bg-secondary text-white d-flex align-items-center justify-content-center fw-bold" style="width: 32px; height: 32px; font-size: 0.8rem;">
-                                <?php echo $inicial; ?>
-                            </div>
-                            <div>
-                                <span class="fw-bold text-dark small"><?php echo htmlspecialchars($autor); ?></span>
+        <div class="fr-comment" id="comentario-<?php echo $id; ?>" style="margin-left: <?php echo $indent_rem; ?>rem;">
+            <div class="fr-comment-card<?php echo ($nivel > 0) ? ' fr-comment-reply' : ''; ?>">
+                <div class="fr-comment-top">
+                    <div class="fr-author">
+                        <div class="fr-avatar fr-avatar-sm" style="background: linear-gradient(135deg, var(--pd-primary), var(--pd-ink));"><?php echo htmlspecialchars($inicial); ?></div>
+                        <div>
+                            <div class="fr-name">
+                                <?php echo htmlspecialchars($autor); ?>
                                 <?php if ($es_autor): ?>
-                                    <span class="badge bg-light text-primary border px-1 py-0 ms-1" style="font-size: 0.65rem;">Tú</span>
+                                    <span class="fr-badge" style="background:var(--pd-lime); color:var(--pd-ink)">Tú</span>
                                 <?php endif; ?>
                                 <?php if ($nivel > 0): ?>
-                                    <span class="badge bg-secondary-subtle text-secondary ms-1" style="font-size: 0.65rem;"><i class="fas fa-reply me-1"></i>Respuesta</span>
+                                    <span class="fr-badge" style="background:var(--pd-paper); color:var(--pd-muted)"><i class="fas fa-reply"></i> Respuesta</span>
                                 <?php endif; ?>
                             </div>
-                        </div>
-                        <div class="d-flex align-items-center gap-2">
-                            <span class="text-muted small" style="font-size: 0.75rem;"><i class="far fa-clock me-1"></i><?php echo $fecha; ?></span>
-                            <?php if ($es_autor): ?>
-                                <form method="POST" action="/foros/eliminarComentario" onsubmit="return confirmarAccionSweet(event, '¿Eliminar este comentario?', 'No podrás recuperar tu aporte ni las respuestas asociadas.');" class="d-inline">
-                                    <input type="hidden" name="id" value="<?php echo $id; ?>">
-                                    <input type="hidden" name="foro_id" value="<?php echo $comentario['foro_id']; ?>">
-                                    <button type="submit" class="btn btn-sm btn-link text-danger p-0 ms-1" title="Eliminar"><i class="fas fa-trash-alt"></i></button>
-                                </form>
-                            <?php endif; ?>
+                            <div class="fr-meta">
+                                <span><i class="far fa-clock"></i> <?php echo $fecha; ?></span>
+                            </div>
                         </div>
                     </div>
-                    
-                    <div class="text-dark mb-2" style="font-size: 0.95rem; line-height: 1.5; word-break: break-word;">
-                        <?php echo nl2br(htmlspecialchars($comentario['mensaje'])); ?>
+                    <div class="fr-comment-actions">
+                        <?php if ($es_autor): ?>
+                            <form method="POST" action="/foros/eliminarComentario" onsubmit="return confirmarAccionSweet(event, '¿Eliminar este comentario?', 'No podrás recuperar tu aporte ni las respuestas asociadas.');" class="d-inline">
+                                <input type="hidden" name="id" value="<?php echo $id; ?>">
+                                <input type="hidden" name="foro_id" value="<?php echo $comentario['foro_id']; ?>">
+                                <button type="submit" class="fr-del" title="Eliminar comentario"><i class="fas fa-trash-alt"></i></button>
+                            </form>
+                        <?php endif; ?>
                     </div>
+                </div>
 
-                    <div class="text-end">
-                        <button type="button" class="btn btn-sm btn-link text-primary text-decoration-none p-0 fw-bold small" onclick="responderA('<?php echo $id; ?>', '<?php echo addslashes($autor); ?>')">
-                            <i class="fas fa-reply me-1"></i> Responder
-                        </button>
-                    </div>
+                <div class="fr-comment-body">
+                    <?php echo nl2br(htmlspecialchars($comentario['mensaje'], ENT_QUOTES, 'UTF-8')); ?>
+                </div>
+
+                <div class="fr-comment-foot">
+                    <button type="button" class="fr-reply-btn" onclick="responderA('<?php echo $id; ?>', '<?php echo addslashes($autor); ?>')">
+                        <i class="fas fa-reply"></i> Responder
+                    </button>
                 </div>
             </div>
 
@@ -94,120 +94,179 @@ if (!function_exists('renderizarComentario')) {
 }
 ?>
 
-<div class="page-content" style="background: #F8FAFC; min-height: calc(100vh - 70px); padding-bottom: 60px;">
+<style>
+  .fr-wrap { max-width: var(--pd-maxw); margin: 0 auto; padding: 28px 24px 72px; }
+  .fr-back { display: inline-flex; align-items: center; gap: 10px; font-family: var(--pd-body); font-weight: 600; font-size: 14px; color: var(--pd-ink); background: var(--pd-surface); border: 1px solid var(--pd-line); border-radius: 999px; padding: 10px 18px; text-decoration: none; box-shadow: var(--pd-sh-1); transition: all .2s; margin-bottom: 24px; }
+  .fr-back:hover { border-color: var(--pd-ink); transform: translateY(-1px); }
+  .fr-back i { color: var(--pd-primary); }
+  .fr-grid { display: grid; grid-template-columns: 1fr; gap: 24px; }
+  @media (min-width: 992px) { .fr-grid { grid-template-columns: 1fr 340px; } }
+  .fr-col { display: flex; flex-direction: column; gap: 20px; }
+
+  /* Tarjeta base pd-* */
+  .fr-card { background: var(--pd-surface); border: 1px solid var(--pd-line); border-radius: var(--pd-r-md); box-shadow: var(--pd-sh-1); }
+  .fr-card-pad { padding: 26px 28px; }
+
+  /* Hilo principal */
+  .fr-thread-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; flex-wrap: wrap; margin-bottom: 20px; }
+  .fr-author { display: flex; align-items: center; gap: 12px; }
+  .fr-avatar { width: 44px; height: 44px; border-radius: 999px; display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 700; font-size: 14px; flex-shrink: 0; }
+  .fr-avatar-lg { width: 52px; height: 52px; font-size: 16px; }
+  .fr-avatar-sm { width: 34px; height: 34px; font-size: 12px; }
+  .fr-author .fr-name { font-weight: 700; color: var(--pd-ink); display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .fr-author .fr-meta { font-size: 13px; color: var(--pd-muted); display: flex; align-items: center; gap: 8px; margin-top: 3px; flex-wrap: wrap; }
+  .fr-badge { display: inline-flex; align-items: center; gap: 6px; font-weight: 600; font-size: 12px; padding: 4px 10px; border-radius: 999px; }
+  .fr-top-actions { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+  .fr-del { background: transparent; border: 1px solid var(--pd-line); color: var(--pd-accent); width: 34px; height: 34px; border-radius: 999px; display: inline-flex; align-items: center; justify-content: center; cursor: pointer; transition: all .2s; }
+  .fr-del:hover { background: var(--pd-accent); color: #fff; border-color: var(--pd-accent); }
+
+  .fr-thread-title { font-family: var(--pd-display); font-size: clamp(24px, 3.2vw, 32px); font-weight: 700; letter-spacing: -.02em; line-height: 1.2; color: var(--pd-ink); margin: 6px 0 16px; }
+  .fr-thread-body { color: var(--pd-muted); font-size: 16px; line-height: 1.75; word-break: break-word; }
+
+  /* Reacciones */
+  .fr-reactions { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 14px; margin-top: 24px; padding: 16px 18px; background: var(--pd-paper); border: 1px solid var(--pd-line); border-radius: var(--pd-r-sm); }
+  .fr-reactions-label { font-family: var(--pd-body); font-weight: 700; font-size: 14px; color: var(--pd-ink); display: inline-flex; align-items: center; gap: 8px; }
+  .fr-reactions-label i { color: var(--pd-accent); }
+  .fr-reactions-list { display: flex; gap: 10px; flex-wrap: wrap; }
+  .fr-rxn { display: inline-flex; align-items: center; gap: 8px; font-family: var(--pd-body); font-weight: 600; font-size: 14px; padding: 8px 14px; border-radius: 999px; border: 1.5px solid var(--pd-line); background: var(--pd-surface); color: var(--pd-ink); cursor: pointer; transition: all .2s; }
+  .fr-rxn:hover { border-color: var(--pd-ink); transform: translateY(-1px); }
+  .fr-rxn.is-on { background: var(--pd-ink); color: #fff; border-color: var(--pd-ink); }
+  .fr-rxn.is-on .fr-rxn-count { background: rgba(255,255,255,.22); color: #fff; }
+  .fr-rxn.is-on.rxn-001 { background: var(--pd-primary); border-color: var(--pd-primary); }
+  .fr-rxn.is-on.rxn-002 { background: var(--pd-accent); border-color: var(--pd-accent); }
+  .fr-rxn.is-on.rxn-003 { background: #F59E0B; border-color: #F59E0B; }
+  .fr-rxn-count { display: inline-flex; align-items: center; justify-content: center; min-width: 22px; height: 22px; padding: 0 6px; border-radius: 999px; background: var(--pd-paper); color: var(--pd-ink); font-size: 12px; font-weight: 700; }
+
+  /* Comentarios */
+  .fr-comments-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 20px 28px; border-bottom: 1px solid var(--pd-line); flex-wrap: wrap; }
+  .fr-comments-head h3 { font-family: var(--pd-display); font-size: 18px; font-weight: 700; color: var(--pd-ink); margin: 0; display: inline-flex; align-items: center; gap: 10px; }
+  .fr-comments-head h3 i { color: var(--pd-primary); }
+  .fr-comments-body { padding: 24px 28px; }
+  .fr-comment { margin-bottom: 14px; }
+  .fr-comment-card { background: var(--pd-surface); border: 1px solid var(--pd-line); border-radius: var(--pd-r-sm); padding: 16px 18px; box-shadow: var(--pd-sh-1); }
+  .fr-comment-reply { background: var(--pd-paper); border-left: 3px solid var(--pd-primary); }
+  .fr-comment-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; margin-bottom: 10px; }
+  .fr-comment-actions { display: flex; align-items: center; gap: 8px; }
+  .fr-comment-body { color: var(--pd-ink); font-size: 15px; line-height: 1.6; word-break: break-word; }
+  .fr-comment-foot { margin-top: 10px; text-align: right; }
+  .fr-reply-btn { background: transparent; border: none; color: var(--pd-primary); font-family: var(--pd-body); font-weight: 700; font-size: 13px; cursor: pointer; padding: 0; display: inline-flex; align-items: center; gap: 6px; }
+  .fr-reply-btn:hover { text-decoration: underline; }
+  .fr-empty { text-align: center; padding: 48px 20px; }
+  .fr-empty i { font-size: 40px; color: var(--pd-muted); opacity: .45; }
+  .fr-empty h4 { font-family: var(--pd-display); font-size: 18px; font-weight: 700; color: var(--pd-ink); margin: 14px 0 6px; }
+  .fr-empty p { color: var(--pd-muted); font-size: 14px; margin: 0; }
+
+  /* Caja de respuesta */
+  .fr-reply-box { scroll-margin-top: 100px; }
+  .fr-reply-box h3 { font-family: var(--pd-display); font-size: 18px; font-weight: 700; color: var(--pd-ink); margin: 0 0 14px; display: inline-flex; align-items: center; gap: 10px; }
+  .fr-reply-box h3 i { color: var(--pd-primary); }
+  .fr-reply-alert { display: none; align-items: center; justify-content: space-between; gap: 12px; background: var(--pd-paper); border: 1px solid var(--pd-line); border-radius: var(--pd-r-sm); padding: 10px 14px; margin-bottom: 14px; font-size: 14px; color: var(--pd-ink); }
+  .fr-reply-alert.is-on { display: flex; }
+  .fr-reply-alert button { background: transparent; border: none; color: var(--pd-ink); font-weight: 700; cursor: pointer; }
+  .fr-textarea { width: 100%; background: var(--pd-surface); border: 1px solid var(--pd-line); border-radius: var(--pd-r-sm); padding: 14px 16px; font-family: var(--pd-body); font-size: 15px; color: var(--pd-ink); resize: vertical; outline: none; }
+  .fr-textarea:focus { border-color: var(--pd-primary); }
+  .fr-form-actions { display: flex; justify-content: flex-end; margin-top: 14px; }
+
+  /* Lateral */
+  .fr-side { display: flex; flex-direction: column; gap: 20px; }
+  .fr-rules { background: linear-gradient(135deg, #E9F0FF, #F4F7FF); border: 1px solid var(--pd-line); border-radius: var(--pd-r-md); padding: 22px 24px; box-shadow: var(--pd-sh-1); }
+  .fr-rules h3 { font-family: var(--pd-display); font-size: 16px; font-weight: 700; color: var(--pd-primary); margin: 0 0 14px; display: inline-flex; align-items: center; gap: 8px; }
+  .fr-rules ul { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 12px; }
+  .fr-rules li { font-size: 13.5px; color: var(--pd-ink); line-height: 1.55; display: flex; gap: 10px; }
+  .fr-rules li i { color: var(--pd-primary); margin-top: 2px; }
+  .fr-rules li strong { color: var(--pd-ink); }
+
+  .fr-axes h3 { font-family: var(--pd-display); font-size: 15px; font-weight: 700; color: var(--pd-ink); margin: 0 0 14px; display: inline-flex; align-items: center; gap: 8px; }
+  .fr-axes h3 i { color: var(--pd-accent); }
+  .fr-axes-list { display: flex; flex-direction: column; gap: 8px; }
+  .fr-axis { display: flex; align-items: center; justify-content: space-between; gap: 10px; font-family: var(--pd-body); font-weight: 600; font-size: 14px; color: var(--pd-ink); background: var(--pd-surface); border: 1px solid var(--pd-line); border-radius: var(--pd-r-sm); padding: 10px 14px; text-decoration: none; transition: all .2s; }
+  .fr-axis:hover { border-color: var(--pd-ink); transform: translateY(-1px); }
+  .fr-axis .fr-axis-l { display: inline-flex; align-items: center; gap: 10px; }
+  .fr-axis .fr-axis-r i { color: var(--pd-muted); font-size: 12px; }
+</style>
+
+<section class="pd-body fr-wrap">
     <!-- BOTÓN VOLVER -->
-    <div class="mb-4">
-        <a href="/foros" class="btn btn-white bg-white text-dark fw-bold border shadow-sm rounded-pill px-4 py-2 d-inline-flex align-items-center gap-2 transition-all hover-shadow">
-            <i class="fas fa-arrow-left text-primary"></i> Volver a la Comunidad
-        </a>
-    </div>
+    <a href="/foros" class="fr-back"><i class="fas fa-arrow-left"></i> Volver a la comunidad</a>
 
-    <div class="row g-4">
+    <div class="fr-grid">
         <!-- COLUMNA PRINCIPAL: HILO Y COMENTARIOS -->
-        <div class="col-lg-8">
+        <div class="fr-col">
             <!-- TARJETA DEL HILO PRINCIPAL -->
-            <div class="card border-0 shadow-sm mb-4" style="border-radius: 16px; overflow: hidden;">
-                <div class="card-body p-4 p-md-5">
-                    <!-- Cabecera de Publicación -->
-                    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
-                        <div class="d-flex align-items-center gap-3">
-                            <div class="rounded-circle d-flex align-items-center justify-content-center fw-bold text-white shadow-sm" 
-                                 style="width: 52px; height: 52px; background: linear-gradient(135deg, <?php echo $cat_info['color']; ?>, #1E293B); font-size: 1.1rem;">
-                                <?php echo $iniciales; ?>
+            <article class="fr-card fr-card-pad">
+                <div class="fr-thread-top">
+                    <div class="fr-author">
+                        <div class="fr-avatar fr-avatar-lg" style="background: linear-gradient(135deg, <?php echo htmlspecialchars($cat_info['color']); ?>, var(--pd-ink));"><?php echo htmlspecialchars($iniciales); ?></div>
+                        <div>
+                            <div class="fr-name">
+                                <?php echo htmlspecialchars(($foro['nombres'] ?? 'Estudiante') . ' ' . ($foro['apellido_paterno'] ?? '')); ?>
+                                <?php if ($es_mio): ?>
+                                    <span class="fr-badge" style="background:var(--pd-lime); color:var(--pd-ink)">Tú</span>
+                                <?php endif; ?>
                             </div>
-                            <div>
-                                <h6 class="fw-bold text-dark mb-1 d-flex align-items-center gap-2" style="font-size: 1.1rem;">
-                                    <?php echo htmlspecialchars(($foro['nombres'] ?? 'Estudiante') . ' ' . ($foro['apellido_paterno'] ?? '')); ?>
-                                    <?php if ($es_mio): ?>
-                                        <span class="badge bg-light text-primary border px-2 py-0" style="font-size: 0.75rem;">Tú</span>
-                                    <?php endif; ?>
-                                </h6>
-                                <div class="text-muted small d-flex align-items-center gap-2">
-                                    <span><i class="far fa-clock me-1"></i> <?php echo date('d/m/Y H:i', strtotime($foro['fecha_creacion'])); ?></span>
-                                    <?php if (!empty($foro['universidad_nombre'])): ?>
-                                        <span>•</span>
-                                        <span class="text-secondary fw-semibold"><i class="fas fa-university me-1"></i> <?php echo htmlspecialchars($foro['universidad_nombre']); ?></span>
-                                    <?php endif; ?>
-                                </div>
+                            <div class="fr-meta">
+                                <span><i class="far fa-clock"></i> <?php echo date('d/m/Y H:i', strtotime($foro['fecha_creacion'])); ?></span>
+                                <?php if (!empty($foro['universidad_nombre'])): ?>
+                                    <span>·</span>
+                                    <span><i class="fas fa-graduation-cap"></i> <?php echo htmlspecialchars($foro['universidad_nombre'], ENT_QUOTES, 'UTF-8'); ?></span>
+                                <?php endif; ?>
                             </div>
-                        </div>
-
-                        <div class="d-flex align-items-center gap-2">
-                            <span class="badge px-3 py-2 rounded-pill fw-bold" style="background: <?php echo $cat_info['bg']; ?>; color: <?php echo $cat_info['color']; ?>; font-size: 0.85rem;">
-                                <i class="fas <?php echo $cat_info['icon']; ?> me-1"></i> <?php echo htmlspecialchars($cat_info['label']); ?>
-                            </span>
-                            <?php if ($es_mio): ?>
-                                <form method="POST" action="/foros/eliminar" onsubmit="return confirmarAccionSweet(event, '¿Estás seguro de eliminar tu publicación?', 'Toda la conversación y comentarios serán archivados.');" class="d-inline">
-                                    <input type="hidden" name="id" value="<?php echo $foro['foro_id']; ?>">
-                                    <button type="submit" class="btn btn-light text-danger border rounded-circle d-flex align-items-center justify-content-center" title="Eliminar publicación" style="width: 36px; height: 36px;">
-                                        <i class="fas fa-trash-alt"></i>
-                                    </button>
-                                </form>
-                            <?php endif; ?>
                         </div>
                     </div>
 
-                    <!-- Título del Hilo -->
-                    <h2 class="fw-extrabold text-dark mb-4" style="line-height: 1.3; font-size: 1.8rem;">
-                        <?php echo htmlspecialchars($foro['titulo']); ?>
-                    </h2>
-
-                    <!-- Cuerpo del Mensaje -->
-                    <div class="text-secondary mb-5" style="font-size: 1.08rem; line-height: 1.8; word-break: break-word;">
-                        <?php echo nl2br(htmlspecialchars($foro['descripcion'] ?? '')); ?>
-                    </div>
-
-                    <!-- BARRA DE REACCIONES ASÍNCRONAS (AJAX) -->
-                    <div class="p-3 rounded-4 bg-light border d-flex flex-wrap align-items-center justify-content-between gap-3">
-                        <div class="fw-bold text-dark small">
-                            <i class="fas fa-heart text-danger me-1"></i> ¿Qué te parece esta publicación?
-                        </div>
-                        <div class="d-flex gap-2 flex-wrap" id="contenedor-reacciones">
-                            <!-- TRFO001: Me sirve 👍 -->
-                            <button type="button" class="btn rounded-pill px-3 py-2 fw-bold d-flex align-items-center gap-2 transition-all reaccion-btn <?php echo ($mi_reaccion === 'TRFO001') ? 'btn-primary shadow-sm text-white' : 'btn-white bg-white text-dark border'; ?>" 
-                                    onclick="reaccionarAjax('<?php echo $foro['foro_id']; ?>', 'TRFO001', this)">
-                                <span>👍</span> 
-                                <span>Me sirve</span> 
-                                <span class="badge <?php echo ($mi_reaccion === 'TRFO001') ? 'bg-white text-primary' : 'bg-light text-dark'; ?> rounded-pill ms-1 count-TRFO001"><?php echo (int)($reacciones['TRFO001'] ?? 0); ?></span>
-                            </button>
-
-                            <!-- TRFO002: Gracias ❤️ -->
-                            <button type="button" class="btn rounded-pill px-3 py-2 fw-bold d-flex align-items-center gap-2 transition-all reaccion-btn <?php echo ($mi_reaccion === 'TRFO002') ? 'btn-danger shadow-sm text-white' : 'btn-white bg-white text-dark border'; ?>" 
-                                    onclick="reaccionarAjax('<?php echo $foro['foro_id']; ?>', 'TRFO002', this)">
-                                <span>❤️</span> 
-                                <span>Gracias</span> 
-                                <span class="badge <?php echo ($mi_reaccion === 'TRFO002') ? 'bg-white text-danger' : 'bg-light text-dark'; ?> rounded-pill ms-1 count-TRFO002"><?php echo (int)($reacciones['TRFO002'] ?? 0); ?></span>
-                            </button>
-
-                            <!-- TRFO003: Top Recomendación 🔥 -->
-                            <button type="button" class="btn rounded-pill px-3 py-2 fw-bold d-flex align-items-center gap-2 transition-all reaccion-btn <?php echo ($mi_reaccion === 'TRFO003') ? 'btn-warning text-dark shadow-sm' : 'btn-white bg-white text-dark border'; ?>" 
-                                    onclick="reaccionarAjax('<?php echo $foro['foro_id']; ?>', 'TRFO003', this)">
-                                <span>🔥</span> 
-                                <span>Top</span> 
-                                <span class="badge <?php echo ($mi_reaccion === 'TRFO003') ? 'bg-dark text-warning' : 'bg-light text-dark'; ?> rounded-pill ms-1 count-TRFO003"><?php echo (int)($reacciones['TRFO003'] ?? 0); ?></span>
-                            </button>
-                        </div>
+                    <div class="fr-top-actions">
+                        <span class="fr-badge" style="background:<?php echo htmlspecialchars($cat_info['bg']); ?>; color:<?php echo htmlspecialchars($cat_info['color']); ?>">
+                            <i class="fas <?php echo htmlspecialchars($cat_info['icon']); ?>"></i> <?php echo htmlspecialchars($cat_info['label'], ENT_QUOTES, 'UTF-8'); ?>
+                        </span>
+                        <?php if ($es_mio): ?>
+                            <form method="POST" action="/foros/eliminar" onsubmit="return confirmarAccionSweet(event, '¿Estás seguro de eliminar tu publicación?', 'Toda la conversación y comentarios serán archivados.');" class="d-inline">
+                                <input type="hidden" name="id" value="<?php echo $foro['foro_id']; ?>">
+                                <button type="submit" class="fr-del" title="Eliminar publicación"><i class="fas fa-trash-alt"></i></button>
+                            </form>
+                        <?php endif; ?>
                     </div>
                 </div>
-            </div>
+
+                <h2 class="fr-thread-title"><?php echo htmlspecialchars($foro['titulo'], ENT_QUOTES, 'UTF-8'); ?></h2>
+                <div class="fr-thread-body"><?php echo nl2br(htmlspecialchars($foro['descripcion'] ?? '', ENT_QUOTES, 'UTF-8')); ?></div>
+
+                <!-- BARRA DE REACCIONES ASÍNCRONAS (AJAX) -->
+                <div class="fr-reactions">
+                    <div class="fr-reactions-label"><i class="fas fa-heart"></i> ¿Qué te parece esta publicación?</div>
+                    <div class="fr-reactions-list" id="contenedor-reacciones">
+                        <!-- TRFO001: Me sirve 👍 -->
+                        <button type="button" class="fr-rxn rxn-001 reaccion-btn <?php echo ($mi_reaccion === 'TRFO001') ? 'is-on' : ''; ?>" onclick="reaccionarAjax('<?php echo $foro['foro_id']; ?>', 'TRFO001', this)">
+                            <span>👍</span> <span>Me sirve</span>
+                            <span class="fr-rxn-count count-TRFO001"><?php echo (int)($reacciones['TRFO001'] ?? 0); ?></span>
+                        </button>
+
+                        <!-- TRFO002: Gracias ❤️ -->
+                        <button type="button" class="fr-rxn rxn-002 reaccion-btn <?php echo ($mi_reaccion === 'TRFO002') ? 'is-on' : ''; ?>" onclick="reaccionarAjax('<?php echo $foro['foro_id']; ?>', 'TRFO002', this)">
+                            <span>❤️</span> <span>Gracias</span>
+                            <span class="fr-rxn-count count-TRFO002"><?php echo (int)($reacciones['TRFO002'] ?? 0); ?></span>
+                        </button>
+
+                        <!-- TRFO003: Top Recomendación 🔥 -->
+                        <button type="button" class="fr-rxn rxn-003 reaccion-btn <?php echo ($mi_reaccion === 'TRFO003') ? 'is-on' : ''; ?>" onclick="reaccionarAjax('<?php echo $foro['foro_id']; ?>', 'TRFO003', this)">
+                            <span>🔥</span> <span>Top</span>
+                            <span class="fr-rxn-count count-TRFO003"><?php echo (int)($reacciones['TRFO003'] ?? 0); ?></span>
+                        </button>
+                    </div>
+                </div>
+            </article>
 
             <!-- SECCIÓN DE COMENTARIOS Y RESPUESTAS -->
-            <div class="card border-0 shadow-sm mb-4" style="border-radius: 16px;">
-                <div class="card-header bg-white p-4 border-bottom d-flex justify-content-between align-items-center">
-                    <h5 class="fw-bold mb-0 text-dark d-flex align-items-center gap-2">
-                        <i class="fas fa-comments text-primary"></i> 
-                        Comentarios (<span id="total-comentarios-ui"><?php echo count($comentarios); ?></span>)
-                    </h5>
-                    <a href="#caja-responder" class="btn btn-sm btn-outline-primary rounded-pill fw-bold">
-                        <i class="fas fa-plus me-1"></i> Escribir Comentario
-                    </a>
+            <section class="fr-card">
+                <div class="fr-comments-head">
+                    <h3><i class="fas fa-comments"></i> Comentarios (<span id="total-comentarios-ui"><?php echo count($comentarios); ?></span>)</h3>
+                    <a href="#caja-responder" class="pd-btn pd-btn-ghost" style="padding:8px 16px; font-size:13px;"><i class="fas fa-plus"></i> Escribir comentario</a>
                 </div>
-                <div class="card-body p-4">
+                <div class="fr-comments-body">
                     <?php if (empty($arbol)): ?>
-                        <div class="text-center py-5 my-2">
-                            <i class="far fa-comment-dots text-muted mb-3" style="font-size: 3rem; opacity: 0.5;"></i>
-                            <h6 class="fw-bold text-dark">Aún no hay comentarios en esta conversación</h6>
-                            <p class="text-muted small mb-0">¡Sé el primero en aportar un consejo o responder la duda!</p>
+                        <div class="fr-empty">
+                            <i class="far fa-comment-dots"></i>
+                            <h4>Aún no hay comentarios</h4>
+                            <p>¡Sé el primero en aportar un consejo o responder la duda!</p>
                         </div>
                     <?php else: ?>
                         <div class="lista-comentarios">
@@ -217,85 +276,83 @@ if (!function_exists('renderizarComentario')) {
                         </div>
                     <?php endif; ?>
                 </div>
-            </div>
+            </section>
 
             <!-- CAJA DE RESPUESTA / NUEVO COMENTARIO -->
-            <div class="card border-0 shadow-sm" id="caja-responder" style="border-radius: 16px; scroll-margin-top: 100px;">
-                <div class="card-body p-4 p-md-5">
-                    <h5 class="fw-bold text-dark mb-3 d-flex align-items-center gap-2">
-                        <i class="fas fa-pen text-primary"></i> Deja tu aporte o comentario
-                    </h5>
-                    
-                    <div id="alerta-respuesta-padre" class="alert alert-info py-2 px-3 d-none align-items-center justify-content-between mb-3 rounded-3" style="font-size: 0.9rem;">
-                        <div>
-                            <i class="fas fa-reply me-2"></i> Respondiendo al comentario de: <strong id="nombre-autor-padre"></strong>
-                        </div>
-                        <button type="button" class="btn btn-sm btn-link text-dark p-0 fw-bold text-decoration-none" onclick="cancelarRespuesta()">
-                            <i class="fas fa-times me-1"></i> Cancelar respuesta
-                        </button>
-                    </div>
+            <section class="fr-card fr-card-pad fr-reply-box" id="caja-responder">
+                <h3><i class="fas fa-pen"></i> Deja tu aporte o comentario</h3>
 
-                    <form method="POST" action="/foros/comentar">
-                        <input type="hidden" name="foro_id" value="<?php echo $foro['foro_id']; ?>">
-                        <input type="hidden" name="comentario_padre_id" id="input_comentario_padre_id" value="">
-                        
-                        <div class="mb-3">
-                            <textarea name="mensaje" id="textarea_mensaje" class="form-control border shadow-sm p-3" rows="4" required placeholder="Escribe aquí tu consejo, respuesta o recomendación para la comunidad..." style="border-radius: 12px; font-size: 1rem;"></textarea>
-                        </div>
-
-                        <div class="d-flex justify-content-end">
-                            <button type="submit" class="btn btn-primary px-5 py-2 fw-bold shadow-sm d-flex align-items-center gap-2" style="border-radius: 12px; background: linear-gradient(135deg, #3B82F6, #2563EB); border: none;">
-                                <i class="fas fa-paper-plane"></i> Publicar Comentario
-                            </button>
-                        </div>
-                    </form>
+                <div id="alerta-respuesta-padre" class="fr-reply-alert">
+                    <div><i class="fas fa-reply"></i> Respondiendo al comentario de: <strong id="nombre-autor-padre"></strong></div>
+                    <button type="button" onclick="cancelarRespuesta()"><i class="fas fa-times"></i> Cancelar</button>
                 </div>
-            </div>
+
+                <form method="POST" action="/foros/comentar">
+                    <input type="hidden" name="foro_id" value="<?php echo $foro['foro_id']; ?>">
+                    <input type="hidden" name="comentario_padre_id" id="input_comentario_padre_id" value="">
+
+                    <textarea name="mensaje" id="textarea_mensaje" class="fr-textarea" rows="4" required placeholder="Escribe aquí tu consejo, respuesta o recomendación para la comunidad..."></textarea>
+
+                    <div class="fr-form-actions">
+                        <button type="submit" class="pd-btn pd-btn-primary"><i class="fas fa-paper-plane"></i> Publicar comentario</button>
+                    </div>
+                </form>
+            </section>
         </div>
 
         <!-- COLUMNA LATERAL: INFORMACIÓN Y TIPS DE CONVIVENCIA -->
-        <div class="col-lg-4">
-            <div class="card border-0 shadow-sm mb-4" style="border-radius: 16px; background: linear-gradient(135deg, #EFF6FF, #DBEAFE);">
-                <div class="card-body p-4">
-                    <h5 class="fw-bold text-primary mb-3"><i class="fas fa-lightbulb me-2"></i>Normas de la Comunidad</h5>
-                    <ul class="list-unstyled text-dark small mb-0 d-flex flex-column gap-2" style="line-height: 1.6;">
-                        <li><i class="fas fa-check-circle text-primary me-2"></i> <strong>Se respetuoso:</strong> Evita lenguaje ofensivo o ataques personales hacia compañeros o propietarios.</li>
-                        <li><i class="fas fa-check-circle text-primary me-2"></i> <strong>No compartas datos privados:</strong> Por tu seguridad, no publiques contraseñas, números de cuenta o direcciones exactas públicamente.</li>
-                        <li><i class="fas fa-check-circle text-primary me-2"></i> <strong>Verifica antes de rentar:</strong> Las recomendaciones de zónas son referenciales. Realiza siempre un contrato formal.</li>
-                    </ul>
-                </div>
+        <aside class="fr-side">
+            <div class="fr-rules">
+                <h3><i class="fas fa-lightbulb"></i> Normas de la comunidad</h3>
+                <ul>
+                    <li><i class="fas fa-check-circle"></i> <span><strong>Se respetuoso:</strong> Evita lenguaje ofensivo o ataques personales hacia compañeros o propietarios.</span></li>
+                    <li><i class="fas fa-check-circle"></i> <span><strong>No compartas datos privados:</strong> Por tu seguridad, no publiques contraseñas, números de cuenta o direcciones exactas públicamente.</span></li>
+                    <li><i class="fas fa-check-circle"></i> <span><strong>Verifica antes de rentar:</strong> Las recomendaciones de zonas son referenciales. Realiza siempre un contrato formal.</span></li>
+                </ul>
             </div>
 
-            <!-- Botón flotante para explorar otras categorías -->
-            <div class="card border-0 shadow-sm" style="border-radius: 16px;">
-                <div class="card-body p-4">
-                    <h6 class="fw-bold text-dark mb-3"><i class="fas fa-tags me-2 text-warning"></i>Ejes Universitarios</h6>
-                    <div class="d-flex flex-column gap-2">
-                        <?php foreach ($categorias as $cat): 
-                            $c_cod = $cat['codigo'];
-                            $c_info = $iconos_cat[$c_cod] ?? ['icon' => 'fa-tag', 'label' => $cat['nombre'], 'color' => '#64748B'];
-                        ?>
-                            <a href="/foros?categoria=<?php echo urlencode($c_cod); ?>" class="btn btn-light bg-white text-start fw-semibold border d-flex align-items-center justify-content-between py-2 px-3 rounded-3 hover-shadow transition-all">
-                                <span>
-                                    <i class="fas <?php echo $c_info['icon']; ?> me-2" style="color: <?php echo $c_info['color']; ?>;"></i>
-                                    <?php echo htmlspecialchars($c_info['label']); ?>
-                                </span>
-                                <i class="fas fa-chevron-right small text-muted"></i>
-                            </a>
-                        <?php endforeach; ?>
-                    </div>
+            <div class="fr-card fr-card-pad fr-axes">
+                <h3><i class="fas fa-tags"></i> Ejes universitarios</h3>
+                <div class="fr-axes-list">
+                    <?php foreach ($categorias as $cat):
+                        $c_cod = $cat['codigo'];
+                        $c_info = $iconos_cat[$c_cod] ?? ['icon' => 'fa-tag', 'label' => $cat['nombre'], 'color' => '#6B6F7A'];
+                    ?>
+                        <a href="/foros?categoria=<?php echo urlencode($c_cod); ?>" class="fr-axis">
+                            <span class="fr-axis-l"><i class="fas <?php echo htmlspecialchars($c_info['icon']); ?>" style="color:<?php echo htmlspecialchars($c_info['color']); ?>"></i> <?php echo htmlspecialchars($c_info['label'], ENT_QUOTES, 'UTF-8'); ?></span>
+                            <span class="fr-axis-r"><i class="fas fa-chevron-right"></i></span>
+                        </a>
+                    <?php endforeach; ?>
                 </div>
             </div>
-        </div>
+        </aside>
     </div>
-</div>
+</section>
 
 <script>
+// Confirmación destructiva con Swal2 (el layout public carga Swal2 pero no define esta función).
+function confirmarAccionSweet(event, titulo, texto) {
+    event.preventDefault();
+    const form = event.target.closest('form') || event.target;
+    Swal.fire({
+        title: titulo || '¿Estás seguro?',
+        text: texto || 'Esta acción no se puede deshacer.',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#FF5A3C',
+        cancelButtonColor: '#6B6F7A',
+        confirmButtonText: 'Sí, eliminar',
+        cancelButtonText: 'Cancelar',
+        reverseButtons: true
+    }).then((r) => { if (r.isConfirmed) form.submit(); });
+    return false;
+}
+
 /**
- * Lógica AJAX para enviar reacciones dinámicamente con Fetch API
+ * Lógica AJAX para enviar reacciones dinámicamente con Fetch API.
+ * La ruta real del router es /foros/reaccionar (mapea a ForoController::reaccionarAjax).
  */
 function reaccionarAjax(foroId, tipoReaccion, botonClickeado) {
-    // Deshabilitar momentáneamente para evitar doble clic
     botonClickeado.disabled = true;
 
     fetch('/foros/reaccionar', {
@@ -320,36 +377,22 @@ function reaccionarAjax(foroId, tipoReaccion, botonClickeado) {
                 document.querySelectorAll('.count-TRFO003').forEach(el => el.textContent = data.conteos['TRFO003'] || 0);
             }
 
-            // Reiniciar estilos de los botones
-            const botones = document.querySelectorAll('.reaccion-btn');
-            botones.forEach(btn => {
-                btn.className = 'btn rounded-pill px-3 py-2 fw-bold d-flex align-items-center gap-2 transition-all reaccion-btn btn-white bg-white text-dark border';
-                const badge = btn.querySelector('.badge');
-                if (badge) badge.className = 'badge bg-light text-dark rounded-pill ms-1 ' + badge.className.split(' ').pop();
-            });
+            // Reiniciar estilos: quitar is-on de todos los botones de reacción
+            document.querySelectorAll('.reaccion-btn').forEach(btn => btn.classList.remove('is-on'));
 
             // Resaltar el botón activo si no fue removido
             if (data.mi_reaccion) {
-                if (data.mi_reaccion === 'TRFO001') {
-                    botonClickeado.className = 'btn rounded-pill px-3 py-2 fw-bold d-flex align-items-center gap-2 transition-all reaccion-btn btn-primary shadow-sm text-white';
-                    botonClickeado.querySelector('.badge').className = 'badge bg-white text-primary rounded-pill ms-1 count-TRFO001';
-                } else if (data.mi_reaccion === 'TRFO002') {
-                    botonClickeado.className = 'btn rounded-pill px-3 py-2 fw-bold d-flex align-items-center gap-2 transition-all reaccion-btn btn-danger shadow-sm text-white';
-                    botonClickeado.querySelector('.badge').className = 'badge bg-white text-danger rounded-pill ms-1 count-TRFO002';
-                } else if (data.mi_reaccion === 'TRFO003') {
-                    botonClickeado.className = 'btn rounded-pill px-3 py-2 fw-bold d-flex align-items-center gap-2 transition-all reaccion-btn btn-warning text-dark shadow-sm';
-                    botonClickeado.querySelector('.badge').className = 'badge bg-dark text-warning rounded-pill ms-1 count-TRFO003';
-                }
+                botonClickeado.classList.add('is-on');
             }
         } else {
             Swal.fire({
                 icon: 'error',
                 title: 'No se pudo reaccionar',
                 text: data.error || 'Ocurrió un problema al procesar tu reacción',
-                confirmButtonColor: '#2563EB',
+                confirmButtonColor: '#2A44FF',
                 customClass: {
                     popup: 'rounded-4 shadow-lg border-0',
-                    confirmButton: 'btn btn-primary px-4 py-2 rounded-pill fw-bold'
+                    confirmButton: 'pd-btn pd-btn-primary'
                 },
                 buttonsStyling: false
             });
@@ -367,10 +410,9 @@ function reaccionarAjax(foroId, tipoReaccion, botonClickeado) {
 function responderA(comentarioId, autorNombre) {
     document.getElementById('input_comentario_padre_id').value = comentarioId;
     document.getElementById('nombre-autor-padre').textContent = autorNombre;
-    
+
     const alerta = document.getElementById('alerta-respuesta-padre');
-    alerta.classList.remove('d-none');
-    alerta.classList.add('d-flex');
+    alerta.classList.add('is-on');
 
     const textarea = document.getElementById('textarea_mensaje');
     textarea.placeholder = `Escribe tu respuesta a ${autorNombre}...`;
@@ -383,8 +425,7 @@ function responderA(comentarioId, autorNombre) {
 function cancelarRespuesta() {
     document.getElementById('input_comentario_padre_id').value = '';
     const alerta = document.getElementById('alerta-respuesta-padre');
-    alerta.classList.add('d-none');
-    alerta.classList.remove('d-flex');
+    alerta.classList.remove('is-on');
 
     const textarea = document.getElementById('textarea_mensaje');
     textarea.placeholder = 'Escribe aquí tu consejo, respuesta o recomendación para la comunidad...';
