@@ -78,7 +78,7 @@ class ForoController extends Controller {
             'usuario_actual'    => $usuario
         ];
 
-        $this->render('inquilino/foro/index', $data, 'main');
+        $this->render('inquilino/foro/index', $data, 'public');
     }
 
     /**
@@ -120,7 +120,7 @@ class ForoController extends Controller {
             'usuario_id'    => $_SESSION['usuario_id']
         ];
 
-        $this->render('inquilino/foro/view', $data, 'main');
+        $this->render('inquilino/foro/view', $data, 'public');
     }
 
     /**
