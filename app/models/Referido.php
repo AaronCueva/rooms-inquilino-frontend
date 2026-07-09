@@ -187,7 +187,7 @@ class Referido
             // Acreditar puntos al referidor (PuntosNido — W5.8, contrato congelado)
             $referidor_id = $row['usuario_referidor_id'];
             $descripcion = 'Bono por referir a ' . $referido_id;
-            \App\Models\PuntosNido::acreditar(
+            (new \App\Models\PuntosNido())->acreditar(
                 $referidor_id,
                 \App\Models\PuntosNido::TMPT_REFERIDO,
                 self::PUNTOS_REFERIDO,
@@ -205,7 +205,8 @@ class Referido
     /**
      * Aplica un código de referido durante el registro de un nuevo usuario.
      * Busca el referidor por el código (fila más reciente con ese código → usuario_referidor_id).
-     * Si hay referidor y no es auto-referido → registrar() + acreditar() al instante (D5).
+     * Registra la invitación en estado PENDIENTE (ESREF01) para que sea acreditada
+     * o anulada por el Administrador de Sociales en el panel de administración (rooms-frontend).
      * Silencioso: no rompe el registro si falla.
      */
     public function aplicarCodigoEnRegistro(string $referido_id_nuevo, string $codigo): void
@@ -255,10 +256,8 @@ class Referido
                 return;
             }
 
-            $nuevoReferidoId = $this->registrar($referidor_id, $referido_id_nuevo, $codigo);
-            if ($nuevoReferidoId) {
-                $this->acreditar($nuevoReferidoId);
-            }
+            // Crear el referido en estado PENDIENTE (ESREF01) para aprobación del Admin de Sociales
+            $this->registrar($referidor_id, $referido_id_nuevo, $codigo);
         } catch (\Throwable $e) {
             // Silencioso: no romper el registro
         }

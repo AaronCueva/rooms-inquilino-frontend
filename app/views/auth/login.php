@@ -23,6 +23,11 @@
             Al iniciar sesión aceptas los <a href="#">Términos de uso</a> y la <a href="#">Política de privacidad</a> de APP-ROOMS.
         </div>
         <button type="submit" class="btn btn-primary btn-block w-100">Ingresar a mi cuenta</button>
+        <div class="mt-3">
+            <a href="/buscar" class="btn btn-outline-secondary btn-block w-100" style="display: flex; align-items: center; justify-content: center; gap: 8px; font-weight: 600; border-radius: 999px; padding: 11px 20px; text-decoration: none;">
+                <i class="fas fa-search"></i> Explorar alojamientos sin iniciar sesión
+            </a>
+        </div>
     </form>
     
     <div class="auth-footer mt-4">

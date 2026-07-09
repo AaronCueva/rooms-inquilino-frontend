@@ -23,6 +23,18 @@ function pn_fecha($f) {
     $ts = strtotime($f);
     return $ts ? date('d M Y, H:i', $ts) : pn_h($f);
 }
+function pn_tipo_nombre($cod) {
+    $map = [
+        'TMPT001' => 'Bono de Referido',
+        'TMPT002' => 'Reseña',
+        'TMPT003' => 'Pago Puntual',
+        'TMPT004' => 'Participación',
+        'TMPT005' => 'Canje de Beneficio',
+        'TMPT006' => 'Ajuste',
+        'TMPT007' => 'Bono de Bienvenida',
+    ];
+    return $map[$cod] ?? $cod;
+}
 ?>
 <style>
   .pn-wrap { max-width: var(--pd-maxw); margin: 0 auto; padding: 36px 28px 72px; }
@@ -112,7 +124,7 @@ function pn_fecha($f) {
                             <tr>
                                 <td><?php echo pn_fecha($m['fecha_creacion'] ?? null); ?></td>
                                 <td><?php echo pn_h($m['descripcion'] ?? '—'); ?></td>
-                                <td><span class="pn-chip" style="font-size:11px"><?php echo pn_h($m['tipo_movimiento_codigo'] ?? ''); ?></span></td>
+                                <td><span class="pn-chip" style="font-size:11px"><?php echo pn_h(pn_tipo_nombre($m['tipo_movimiento_codigo'] ?? '')); ?></span></td>
                                 <td style="text-align:right" class="<?php echo $p >= 0 ? 'pn-pos' : 'pn-neg'; ?>"><?php echo ($p >= 0 ? '+' : '') . $p; ?></td>
                             </tr>
                         <?php endforeach; ?>

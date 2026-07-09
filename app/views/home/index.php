@@ -164,15 +164,23 @@ $pinPins = array_slice($destacados, 0, 5);
         <span class="pd-eyebrow">Comunidad</span>
         <h2 style="margin-top:10px">Universidades aliadas</h2>
     </div>
-    <div class="pd-marquee pd-reveal">
-        <div class="pd-marquee-track">
-            <?php
-            $uniList = array_merge($universidades, $universidades); // duplicar para loop continuo
-            foreach ($uniList as $uni): ?>
+    <?php if (count($universidades) <= 4): ?>
+        <div class="pd-uni-center pd-reveal">
+            <?php foreach ($universidades as $uni): ?>
                 <span class="pd-uni"><i class="fas fa-university"></i> <?php echo htmlspecialchars($uni['nombre']); ?></span>
             <?php endforeach; ?>
         </div>
-    </div>
+    <?php else: ?>
+        <div class="pd-marquee pd-reveal">
+            <div class="pd-marquee-track">
+                <?php
+                $uniList = array_merge($universidades, $universidades, $universidades, $universidades);
+                foreach ($uniList as $uni): ?>
+                    <span class="pd-uni"><i class="fas fa-university"></i> <?php echo htmlspecialchars($uni['nombre']); ?></span>
+                <?php endforeach; ?>
+            </div>
+        </div>
+    <?php endif; ?>
 </section>
 <?php endif; ?>
 
