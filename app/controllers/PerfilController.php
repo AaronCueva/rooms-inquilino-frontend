@@ -10,6 +10,8 @@ use App\Models\PuntosNido;
 use App\Models\Chat;
 use App\Models\Referido;
 use App\Models\Blog;
+use App\Models\Reserva;
+use App\Models\Contrato;
 
 /**
  * PerfilController (W5.6 edición de perfil + W5.4 verificación de identidad).
@@ -196,21 +198,39 @@ class PerfilController extends Controller
             $blogRecientes = [];
         }
 
+        // W3 — reservas recientes
+        $reservasRecientes = [];
+        try {
+            $reservasRecientes = (new Reserva())->misReservas($uid, 1, 3);
+        } catch (\Throwable $e) {
+            $reservasRecientes = [];
+        }
+
+        // W4 — contratos recientes
+        $contratosRecientes = [];
+        try {
+            $contratosRecientes = (new Contrato())->misContratos($uid, 1, 3);
+        } catch (\Throwable $e) {
+            $contratosRecientes = [];
+        }
+
         $descuentos = $this->listarDescuentos();
         $beneficios = $this->listarBeneficios();
 
         $this->render('inquilino/perfil/dashboard', [
-            'usuario'        => $usuario,
-            'saldo'          => $saldo,
-            'nivel'          => $nivel,
-            'racha'          => $racha,
-            'ultMov'         => $ultMov,
-            'noLeidos'       => $noLeidos,
-            'refActivos'     => $refActivos,
-            'refPendientes'  => $refPendientes,
-            'blogRecientes'  => $blogRecientes,
-            'descuentos'     => $descuentos,
-            'beneficios'     => $beneficios,
+            'usuario'            => $usuario,
+            'saldo'              => $saldo,
+            'nivel'              => $nivel,
+            'racha'              => $racha,
+            'ultMov'             => $ultMov,
+            'noLeidos'           => $noLeidos,
+            'refActivos'         => $refActivos,
+            'refPendientes'      => $refPendientes,
+            'blogRecientes'      => $blogRecientes,
+            'descuentos'         => $descuentos,
+            'beneficios'         => $beneficios,
+            'reservasRecientes'  => $reservasRecientes,
+            'contratosRecientes' => $contratosRecientes,
         ], 'main');
     }
 

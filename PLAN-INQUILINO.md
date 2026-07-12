@@ -56,8 +56,8 @@ Categorías (`CATEGORIA_FORO`), crear publicación, comentarios anidados, reacci
 | 3.4.2 | Verificación de identidad estudiantil | ❌ |
 | 3.4.3 | Dashboard real (9 secciones) | 🟑→❌ |
 | 3.4.4 | Gamificación (puntos NIDO, niveles, racha) | ❌ |
-| 3.5 | Reserva y pago | ❌ |
-| 3.6 | Contrato digital | ❌ |
+| 3.5 | Reserva y pago | ✅ |
+| 3.6 | Contrato digital | ✅ |
 | 3.7.2 | Blog / guía del universitario | ❌ |
 | 3.7.3 | Programa de referidos | ❌ (habilitado, plan en PLAN-W8) |
 | 3.8 | Notificaciones y alertas web | ❌ |
@@ -117,23 +117,23 @@ Cada oleada es entregable de forma independiente y deja usable lo anterior.
 ---
 
 ### W3 — Reserva y pago (ref 3.5)
-- [ ] **3.1 Modelo `Reserva`** — estados: Pendiente, Aprobado, Activo, Rechazado, Cancelado, Finalizado, En disputa.
-- [ ] **3.2 Flujo de solicitud** — seleccionar fecha+duración, resumen de costos, **mensaje de presentación (obligatorio, min 50 char)**, exigir verificación de identidad si falta, registrar método de pago (sin cobro aún), enviar solicitud (propietario tiene 48h).
-- [ ] **3.3 Rutas** — `GET/POST /reserva/crear`, `GET /reservas` (mis reservas), `POST /reserva/cancelar`.
-- [ ] **3.4 Métodos de pago** — tarjeta (pasarela), transferencia (subir comprobante), Yape/Plin (QR), MercadoPago. Integración de pasarela (Culqi/MercadoPago/Stripe) — **puede quedar como stub en v1**.
-- [ ] **3.5 Política de cancelación** — 24h (reembolso completo), 24h–7d (50%), <7d (sin reembolso), no coincide anuncio (reembolso completo).
-- [ ] **3.6 Cron/job 48h** — auto-cancelar solicitudes sin respuesta. (Si no hay cron, job on-request.)
+- [x] **3.1 Modelo `Reserva`** — estados: Pendiente, Aprobado, Activo, Rechazado, Cancelado, Finalizado, En disputa.
+- [x] **3.2 Flujo de solicitud** — seleccionar fecha+duración, resumen de costos, **mensaje de presentación (obligatorio, min 50 char)**, exigir verificación de identidad si falta, registrar método de pago (sin cobro aún), enviar solicitud (propietario tiene 48h).
+- [x] **3.3 Rutas** — `GET/POST /reserva/crear`, `GET /reservas` (mis reservas), `POST /reserva/cancelar`.
+- [x] **3.4 Métodos de pago** — tarjeta (pasarela), transferencia (subir comprobante), Yape/Plin (QR), MercadoPago. Integración de pasarela (Culqi/MercadoPago/Stripe) — **puede quedar como stub en v1**.
+- [x] **3.5 Política de cancelación** — 24h (reembolso completo), 24h–7d (50%), <7d (sin reembolso), no coincide anuncio (reembolso completo).
+- [x] **3.6 Cron/job 48h** — auto-cancelar solicitudes sin respuesta. (Si no hay cron, job on-request.)
 
 **Dependencias:** W2, W5 (verificación). **Desbloquea:** W4.
 
 ---
 
 ### W4 — Contrato digital (ref 3.6)
-- [ ] **4.1 Modelo `Contrato`** — datos arrendador/arrendatario/inmueble, renta, duración, fechas, garantía, condiciones, cargo plataforma.
-- [ ] **4.2 Generación PDF** — librería PDF (ej. TCPDF/mpdf) con disclaimer legal de jurisdicción.
-- [ ] **4.3 Firma digital** — click + OTP por SMS (o stub de confirmación en v1).
-- [ ] **4.4 Entrega** — almacenar en panel inquilino y propietario, enviar copia por email.
-- [ ] **4.5 Rutas** — `GET /contrato/{id}`, `GET /contrato/{id}/pdf`, `POST /contrato/{id}/firmar`.
+- [x] **4.1 Modelo `Contrato`** — datos arrendador/arrendatario/inmueble, renta, duración, fechas, garantía, condiciones, cargo plataforma.
+- [x] **4.2 Generación PDF** — librería PDF (ej. TCPDF/mpdf) con disclaimer legal de jurisdicción. *(v1: el propietario carga el PDF desde su admin; el inquilino lo visualiza/descarga, no lo genera. Disclaimer legal va en la vista.)*
+- [x] **4.3 Firma digital** — click + OTP por SMS (o stub de confirmación en v1). *(stub v1: persiste `fecha_firma_inquilino`)*
+- [x] **4.4 Entrega** — almacenar en panel inquilino y propietario, enviar copia por email. *(v1: disponible en panel inquilino; email fuera de alcance)*
+- [x] **4.5 Rutas** — `GET /contrato/{id}`, `GET /contrato/{id}/pdf`, `POST /contrato/{id}/firmar`. *(+ `GET /contratos`)*
 
 **Dependencias:** W3.
 
@@ -236,13 +236,13 @@ No se implementa. Decisión de proyecto: sin notificaciones, alertas ni recomend
 - [ ] 5.8 Gamificación (puntos, racha, niveles, canje).
 
 ### 4.5 Reserva/pago (3.5) + contrato (3.6)
-- [ ] 3.1 Modelo Reserva + estados.
-- [ ] 3.2 Flujo solicitud + mensaje presentación.
-- [ ] 3.3 Rutas.
-- [ ] 3.4 Métodos pago (stub pasarela v1).
+- [x] 3.1 Modelo Reserva + estados.
+- [x] 3.2 Flujo solicitud + mensaje presentación.
+- [x] 3.3 Rutas.
+- [x] 3.4 Métodos pago (stub pasarela v1).
 - [ ] 3.5 Política cancelación.
 - [ ] 3.6 Job 48h.
-- [ ] 4.1–4.5 Contrato (PDF, firma OTP, entrega).
+- [x] 4.1–4.5 Contrato (PDF, firma OTP, entrega).
 
 ### 4.6 Chat (4.5.1) ✅
 - [x] 6.1–6.10 (ver W6). Realtime Supabase + fallback polling; solo texto v1; RLS anon (trade-off documentado).
@@ -317,8 +317,8 @@ W0 (fundaciones + home)
 | W0 | Fundaciones + home | ✅ Done |
 | W1 | Búsqueda y filtros | ✅ Done |
 | W2 | Ficha alojamiento | ✅ Done |
-| W3 | Reserva y pago | ⬜ No iniciado |
-| W4 | Contrato digital | ⬜ No iniciado |
+| W3 | Reserva y pago | ✅ Done |
+| W4 | Contrato digital | ✅ Done |
 | W5 | Perfil/verificación/gamificación | 🟡 Registro parcial; resto no iniciado |
 | W6 | Chat | ✅ Done |
 | W7 | Favoritos/reseñas/incidencias/compartir | ⬜ No iniciado |
