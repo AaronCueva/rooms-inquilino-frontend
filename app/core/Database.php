@@ -21,6 +21,7 @@ class Database
             $this->conn = new PDO("pgsql:host={$this->host};port={$this->port};dbname={$this->db_name}", $this->username, $this->password);
             $this->conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
             $this->conn->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
+            $this->conn->setAttribute(PDO::ATTR_EMULATE_PREPARES, true);
         } catch (PDOException $exception) {
             die("Error de conexión a la base de datos: " . $exception->getMessage());
         }

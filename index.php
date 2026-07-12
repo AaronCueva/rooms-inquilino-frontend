@@ -49,6 +49,7 @@ $router->get('/buscar', 'AlojamientoController', 'buscar');
 // Ficha del alojamiento (W2)
 $router->get('/alojamiento/{id}', 'AlojamientoController', 'detalle');
 $router->get('/alojamiento/{id}/resenas', 'AlojamientoController', 'resenas');
+$router->post('/alojamiento/{id}/resena', 'AlojamientoController', 'guardarResena');
 
 // Rutas de Autenticación
 $router->get('/login', 'AuthController', 'showLogin');
@@ -84,6 +85,23 @@ $router->get('/mensajes', 'MensajeController', 'index');
 $router->get('/mensajes/abrir', 'MensajeController', 'abrir');
 $router->get('/mensajes/nuevo', 'MensajeController', 'nuevo');
 $router->post('/mensajes/enviar', 'MensajeController', 'enviar');
+
+// Reserva y pago (W3, ref §3.5)
+$router->get('/reserva/crear', 'ReservaController', 'crear');
+$router->post('/reserva/crear', 'ReservaController', 'crear');
+$router->get('/reservas', 'ReservaController', 'misReservas');
+$router->post('/reserva/cancelar', 'ReservaController', 'cancelar');
+$router->get('/cron/reservas-expiradas', 'ReservaController', 'cronExpiradas'); // on-request, ?key=
+
+// Contrato digital (W4, ref §3.6)
+$router->get('/contratos', 'ContratoController', 'index');
+$router->get('/contrato/{id}', 'ContratoController', 'ver');
+$router->get('/contrato/{id}/pdf', 'ContratoController', 'pdf');
+$router->post('/contrato/{id}/firmar', 'ContratoController', 'firmar');
+
+// Pagos y Pasarela Simulada
+$router->get('/pagos', 'PagoController', 'index');
+$router->post('/pago/{id}/simular', 'PagoController', 'simular');
 
 // Rutas de Comunidad / Foros de Discusión Estudiantil
 $router->get('/foros', 'ForoController', 'index');

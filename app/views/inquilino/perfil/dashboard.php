@@ -19,6 +19,8 @@ $db_refPend = $refPendientes ?? 0;
 $db_blog = $blogRecientes ?? [];
 $db_desc = $descuentos ?? [];
 $db_ben = $beneficios ?? [];
+$db_reservas = $reservasRecientes ?? [];
+$db_contratos = $contratosRecientes ?? [];
 
 function db_h($s) { return htmlspecialchars((string)($s ?? ''), ENT_QUOTES, 'UTF-8'); }
 function db_fecha($f) {
@@ -140,39 +142,72 @@ function db_fecha($f) {
             <?php endif; ?>
         </div>
 
-        <!-- 7. Mis reservas (W3 stub) -->
+        <!-- 7. Mis reservas (W3 activo) -->
         <div class="db-card">
             <h3><i class="fas fa-calendar-check"></i> Mis reservas</h3>
-            <div class="db-stub">Próximamente — gestión de reservas de alojamiento.</div>
-            <button class="db-btn-dis" disabled>Ver reservas</button>
+            <?php if (!empty($db_reservas)): ?>
+                <div class="db-meta">Tienes <strong><?php echo count($db_reservas); ?></strong> reserva(s) registrada(s).</div>
+                <div class="db-list">
+                    <?php foreach ($db_reservas as $r): ?>
+                        <div class="db-li">
+                            <a href="/reservas"><?php echo db_h($r['alojamiento_titulo'] ?? 'Alojamiento'); ?></a>
+                            <span style="float:right;font-size:11px;color:var(--pd-muted)"><?php echo db_h($r['estado_nombre'] ?? $r['estado_codigo'] ?? ''); ?></span>
+                        </div>
+                    <?php endforeach; ?>
+                </div>
+            <?php else: ?>
+                <div class="db-stub">No tienes solicitudes de reserva activas en este momento.</div>
+            <?php endif; ?>
+            <a class="db-link" href="/reservas">Gestionar mis reservas →</a>
         </div>
 
-        <!-- 8. Mi alojamiento actual (W3 stub) -->
+        <!-- 8. Mi alojamiento actual (W3/W4 activo) -->
         <div class="db-card">
             <h3><i class="fas fa-home"></i> Mi alojamiento actual</h3>
-            <div class="db-stub">Próximamente — detalle de tu alojamiento vigente.</div>
-            <button class="db-btn-dis" disabled>Ver alojamiento</button>
+            <?php if (!empty($db_contratos)): $c = $db_contratos[0]; ?>
+                <div class="db-meta"><strong><?php echo db_h($c['alojamiento_titulo'] ?? 'Estancia activa'); ?></strong></div>
+                <div class="db-stub">Distrito: <?php echo db_h($c['distrito'] ?? 'Lima'); ?> · Fin: <?php echo db_fecha($c['fecha_fin'] ?? ''); ?></div>
+                <a class="db-link" href="/contrato/<?php echo urlencode($c['contrato_id']); ?>">Ver mi contrato y detalles →</a>
+            <?php elseif (!empty($db_reservas)): $r = $db_reservas[0]; ?>
+                <div class="db-meta"><strong><?php echo db_h($r['alojamiento_titulo'] ?? 'Reserva en proceso'); ?></strong></div>
+                <div class="db-stub">Ingreso: <?php echo db_fecha($r['fecha_ingreso'] ?? ''); ?> · Duración: <?php echo (int)($r['duracion_meses'] ?? 1); ?> meses</div>
+                <a class="db-link" href="/reservas">Ver estado de mi reserva →</a>
+            <?php else: ?>
+                <div class="db-stub">Explora opciones verificadas cerca a tu universidad o centro de trabajo.</div>
+                <a class="db-link" href="/buscar">Buscar alojamientos →</a>
+            <?php endif; ?>
         </div>
 
-        <!-- 9. Favoritos (W7 stub) -->
+        <!-- 9. Favoritos -->
         <div class="db-card">
             <h3><i class="fas fa-heart"></i> Favoritos</h3>
-            <div class="db-stub">Próximamente — alojamientos guardados.</div>
-            <button class="db-btn-dis" disabled>Ver favoritos</button>
+            <div class="db-stub">Guarda y compara las mejores opciones de habitaciones y minidepartamentos.</div>
+            <a class="db-link" href="/buscar">Explorar alojamientos →</a>
         </div>
 
-        <!-- 10. Mis reseñas (W7 stub) -->
+        <!-- 10. Mis reseñas y comunidad -->
         <div class="db-card">
-            <h3><i class="fas fa-pen-alt"></i> Mis reseñas</h3>
-            <div class="db-stub">Próximamente — reseñas que has publicado.</div>
-            <button class="db-btn-dis" disabled>Ver reseñas</button>
+            <h3><i class="fas fa-pen-alt"></i> Mis reseñas y comunidad</h3>
+            <div class="db-stub">Participa en los foros de discusión y comparte recomendaciones con otros universitarios.</div>
+            <a class="db-link" href="/foros">Ir a la Comunidad Nido →</a>
         </div>
 
-        <!-- 11. Documentos / Contrato (W4 stub) -->
+        <!-- 11. Documentos / Contrato (W4 activo) -->
         <div class="db-card">
             <h3><i class="fas fa-file-contract"></i> Documentos / Contrato</h3>
-            <div class="db-stub">Próximamente — contratos y documentos de tu alojamiento.</div>
-            <button class="db-btn-dis" disabled>Ver documentos</button>
+            <?php if (!empty($db_contratos)): ?>
+                <div class="db-meta">Tienes <strong><?php echo count($db_contratos); ?></strong> contrato(s) digital(es).</div>
+                <div class="db-list">
+                    <?php foreach ($db_contratos as $ct): ?>
+                        <div class="db-li">
+                            <a href="/contrato/<?php echo urlencode($ct['contrato_id']); ?>"><?php echo db_h($ct['alojamiento_titulo'] ?? 'Contrato de Arrendamiento'); ?></a>
+                        </div>
+                    <?php endforeach; ?>
+                </div>
+            <?php else: ?>
+                <div class="db-stub">Tus contratos digitales y acuerdos de arrendamiento en PDF aparecerán aquí.</div>
+            <?php endif; ?>
+            <a class="db-link" href="/contratos">Ver mis contratos →</a>
         </div>
     </div>
 </section>

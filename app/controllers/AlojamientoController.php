@@ -151,4 +151,50 @@ class AlojamientoController extends Controller
             'orden'            => $orden,
         ];
     }
+
+    /**
+     * Endpoint AJAX para crear o actualizar una reseña sobre un alojamiento.
+     */
+    public function guardarResena($params = [])
+    {
+        header('Content-Type: application/json');
+
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+
+        $usuarioId = $_SESSION['usuario_id'] ?? $_SESSION['user_id'] ?? null;
+
+        if (empty($usuarioId)) {
+            echo json_encode(['success' => false, 'error' => 'Debes iniciar sesión como estudiante para publicar una reseña.']);
+            exit;
+        }
+        $alojamientoId = $params['id'] ?? ($_POST['alojamiento_id'] ?? '');
+        $calificacion = intval($_POST['calificacion'] ?? 0);
+        $comentario = trim($_POST['comentario'] ?? '');
+
+        if (empty($alojamientoId)) {
+            echo json_encode(['success' => false, 'error' => 'ID de alojamiento inválido.']);
+            exit;
+        }
+
+        if ($calificacion < 1 || $calificacion > 5) {
+            echo json_encode(['success' => false, 'error' => 'Por favor selecciona una calificación válida entre 1 y 5 estrellas.']);
+            exit;
+        }
+
+        if (empty($comentario) || mb_strlen($comentario) < 5) {
+            echo json_encode(['success' => false, 'error' => 'Por favor escribe un comentario de al menos 5 caracteres.']);
+            exit;
+        }
+
+        $exito = $this->alojamientoModel->crearOActualizarResenia($alojamientoId, $usuarioId, $calificacion, $comentario);
+
+        if ($exito) {
+            echo json_encode(['success' => true, 'message' => '¡Tu reseña ha sido publicada y guardada exitosamente!']);
+        } else {
+            echo json_encode(['success' => false, 'error' => 'Ocurrió un error al guardar la reseña. Inténtalo nuevamente.']);
+        }
+        exit;
+    }
 }
