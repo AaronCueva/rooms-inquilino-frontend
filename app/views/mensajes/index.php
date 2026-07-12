@@ -579,7 +579,7 @@ $otroFoto = $hayChat ? ($otro['url_foto'] ?? '') : '';
         textarea.style.height = Math.min(textarea.scrollHeight, 120) + 'px';
     });
 
-    // --- Polling fallback ---
+    // --- Polling continuo (garantiza recepción instantánea sin F5) ---
     var pollTimer = null;
     function iniciarPolling() {
         if (pollTimer) return;
@@ -593,13 +593,14 @@ $otroFoto = $hayChat ? ($otro['url_foto'] ?? '') : '';
                     }
                 })
                 .catch(function () {});
-        }, 5000);
+        }, 2500);
     }
 
-    // --- Realtime (Supabase) ---
+    // --- Realtime (Supabase opcional) + Polling continuo ---
     scrollAbajo();
+    iniciarPolling(); // Arrancar SIEMPRE el polling para no perder ningún mensaje
+
     if (realtime && typeof supabase !== 'undefined') {
-        var canalConectado = false;
         try {
             var sb = supabase.createClient(
                 <?= json_encode($supabaseUrl) ?>,
@@ -608,13 +609,9 @@ $otroFoto = $hayChat ? ($otro['url_foto'] ?? '') : '';
             sb.channel('chat:' + chatId)
               .on('postgres_changes',
                   { event: 'INSERT', schema: 'public', table: 'mensaje', filter: 'chat_id=eq.' + chatId },
-                  function (payload) { canalConectado = true; appendMensaje(payload.new); })
-              .subscribe(function (status) { if (status === 'SUBSCRIBED') canalConectado = true; });
+                  function (payload) { appendMensaje(payload.new); })
+              .subscribe();
         } catch (e) { /* SDK no disponible */ }
-        setTimeout(function () { if (!canalConectado) iniciarPolling(); }, 5000);
-    } else {
-        // Sin realtime: arrancar polling directo
-        iniciarPolling();
     }
 })();
 </script>

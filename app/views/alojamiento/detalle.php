@@ -225,7 +225,14 @@ $alojId = htmlspecialchars($a['alojamiento_id']);
 
             <!-- Reseñas -->
             <div class="pd-ficha-section">
-                <h3>Reseñas (<?php echo $totalResenas; ?>)</h3>
+                <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:18px;">
+                    <h3 style="margin:0;">Reseñas (<?php echo $totalResenas; ?>)</h3>
+                    <?php if (!empty($_SESSION['usuario_id']) || !empty($_SESSION['user_id'])): ?>
+                        <button type="button" class="pd-btn pd-btn-primary" onclick="abrirModalResena()" style="padding:9px 18px;font-size:13.5px;border-radius:999px;"><i class="fas fa-star" style="margin-right:6px;color:#fbbf24;"></i> Escribir una reseña</button>
+                    <?php else: ?>
+                        <a href="/login" class="pd-btn pd-btn-ghost" style="padding:9px 18px;font-size:13.5px;border-radius:999px;text-decoration:none;"><i class="fas fa-sign-in-alt" style="margin-right:6px;"></i> Inicia sesión para reseñar</a>
+                    <?php endif; ?>
+                </div>
                 <?php if ($totalResenas > 0): ?>
                     <div class="pd-resenas-summary">
                         <div style="text-align:center">
@@ -288,7 +295,7 @@ $alojId = htmlspecialchars($a['alojamiento_id']);
                 <?php if (!$logueado): ?>
                     <a href="/login" class="pd-btn pd-btn-primary" style="width:100%;padding:15px 22px;font-size:15.5px;font-weight:700;text-align:center;display:flex;align-items:center;justify-content:center;gap:10px;border-radius:999px;box-shadow:0 6px 18px rgba(99,102,241,0.3);letter-spacing:0.02em"><i class="fas fa-lock"></i> Inicia sesión para reservar</a>
                 <?php else: ?>
-                    <button class="pd-sb-stub" disabled><i class="fas fa-calendar-check"></i> Solicitar reserva · Próximamente</button>
+                    <button class="pd-btn pd-btn-primary" id="pdSbReservar" style="width:100%;padding:15px 22px;font-size:15.5px;font-weight:700;display:flex;align-items:center;justify-content:center;gap:10px;border-radius:999px;box-shadow:0 6px 18px rgba(99,102,241,0.3);letter-spacing:0.02em"><i class="fas fa-calendar-check"></i> Solicitar reserva</button>
                     <a href="/mensajes/abrir?alojamiento=<?php echo $alojId; ?>" class="pd-btn pd-btn-ghost" style="width:100%;padding:15px 22px;font-size:15.5px;font-weight:700;text-align:center;display:flex;align-items:center;justify-content:center;gap:10px;border-radius:999px;letter-spacing:0.02em"><i class="fas fa-comment"></i> Contactar anfitrión</a>
                     <button class="pd-sb-stub" disabled><i class="fas fa-heart"></i> Favorito · Próximamente</button>
                     <button class="pd-sb-stub" disabled><i class="fas fa-share"></i> Compartir · Próximamente</button>
@@ -369,6 +376,19 @@ $alojId = htmlspecialchars($a['alojamiento_id']);
     }
     mesesSel.addEventListener('change', updResumen); updResumen();
 
+    // --- Solicitar reserva (W3) → /reserva/crear con selección del sidebar ---
+    var btnReservar = document.getElementById('pdSbReservar');
+    if (btnReservar) {
+        var fechaSel = document.getElementById('pdSbFecha');
+        var alojIdRes = <?php echo json_encode($a['alojamiento_id']); ?>;
+        btnReservar.addEventListener('click', function () {
+            var params = 'alojamiento=' + encodeURIComponent(alojIdRes);
+            if (fechaSel && fechaSel.value) { params += '&fecha=' + encodeURIComponent(fechaSel.value); }
+            if (mesesSel) { params += '&meses=' + encodeURIComponent(mesesSel.value); }
+            window.location.href = '/reserva/crear?' + params;
+        });
+    }
+
     // --- Ver más reseñas (AJAX) ---
     var verMasBtn = document.getElementById('pdVerMasResenas');
     if (verMasBtn) {
@@ -390,4 +410,154 @@ $alojId = htmlspecialchars($a['alojamiento_id']);
         });
     }
 })();
+</script>
+
+<!-- MODAL INTERACTIVO DE RESEÑA PD-* -->
+<div id="pdModalResenaOverlay" style="position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(15,23,42,0.65);backdrop-filter:blur(8px);z-index:9999;display:none;align-items:center;justify-content:center;padding:20px;">
+    <div id="pdModalResenaBox" style="background:#fff;border-radius:24px;width:100%;max-width:520px;padding:32px;box-shadow:0 25px 50px -12px rgba(0,0,0,0.25);position:relative;animation:modalFadeIn 0.25s ease;">
+        <button type="button" onclick="cerrarModalResena()" style="position:absolute;top:20px;right:20px;background:var(--pd-paper,#f1f5f9);border:none;width:36px;height:36px;border-radius:50%;cursor:pointer;color:var(--pd-muted);display:grid;place-items:center;font-size:16px;">
+            <i class="fas fa-times"></i>
+        </button>
+        <h3 style="font-family:var(--pd-display);font-size:22px;color:var(--pd-ink);margin:0 0 8px 0;">Tu experiencia en este alojamiento</h3>
+        <p style="color:var(--pd-muted);font-size:14px;margin:0 0 22px 0;">Comparte tu valoración y reseña con otros estudiantes universitarios.</p>
+
+        <form id="formResenaAlj" onsubmit="enviarResenaAlj(event)">
+            <input type="hidden" id="resenaAljId" value="<?php echo htmlspecialchars($a['alojamiento_id']); ?>">
+            <input type="hidden" id="resenaCalifVal" value="5">
+
+            <div style="margin-bottom:20px;">
+                <label style="display:block;font-weight:600;font-size:13.5px;color:var(--pd-ink);margin-bottom:10px;">Calificación en estrellas</label>
+                <div id="starPickerContainer" style="display:flex;gap:10px;font-size:28px;cursor:pointer;">
+                    <?php for ($s = 1; $s <= 5; $s++): ?>
+                        <span class="star-item" data-val="<?php echo $s; ?>" style="color:#fbbf24;transition:transform .15s;"><i class="fas fa-star"></i></span>
+                    <?php endfor; ?>
+                </div>
+                <span id="starTextLabel" style="display:block;font-size:13px;color:var(--pd-muted);margin-top:6px;font-weight:500;">5 estrellas — ¡Excelente!</span>
+            </div>
+
+            <div style="margin-bottom:24px;">
+                <label style="display:block;font-weight:600;font-size:13.5px;color:var(--pd-ink);margin-bottom:8px;">Comentario o reseña detallada</label>
+                <textarea id="resenaComentarioVal" rows="4" required placeholder="Describe qué tal fue tu estancia, la comodidad del cuarto, la cercanía a la universidad y el trato del propietario..." style="width:100%;padding:14px;border:1.5px solid var(--pd-line,#e2e8f0);border-radius:14px;font-family:var(--pd-body);font-size:14.5px;outline:none;transition:border-color .2s;"></textarea>
+            </div>
+
+            <div id="resenaAlertBox" style="display:none;margin-bottom:16px;padding:12px 16px;border-radius:12px;font-size:13.5px;font-weight:500;"></div>
+
+            <div style="display:flex;justify-content:flex-end;gap:12px;">
+                <button type="button" class="pd-btn pd-btn-ghost" onclick="cerrarModalResena()">Cancelar</button>
+                <button type="submit" id="btnSubmitResena" class="pd-btn pd-btn-primary" style="border-radius:999px;padding:11px 26px;">Publicar reseña</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<style>
+@keyframes modalFadeIn {
+    from { opacity: 0; transform: translateY(16px) scale(0.96); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+}
+</style>
+
+<script>
+function abrirModalResena() {
+    var overlay = document.getElementById('pdModalResenaOverlay');
+    if (overlay) overlay.style.display = 'flex';
+}
+function cerrarModalResena() {
+    var overlay = document.getElementById('pdModalResenaOverlay');
+    if (overlay) overlay.style.display = 'none';
+}
+
+(function() {
+    var starContainer = document.getElementById('starPickerContainer');
+    if (!starContainer) return;
+    var stars = starContainer.querySelectorAll('.star-item');
+    var inputCalif = document.getElementById('resenaCalifVal');
+    var labelText = document.getElementById('starTextLabel');
+    var labelsMap = {
+        1: '1 estrella — Muy deficiente',
+        2: '2 estrellas — Regular',
+        3: '3 estrellas — Aceptable',
+        4: '4 estrellas — Muy bueno',
+        5: '5 estrellas — ¡Excelente!'
+    };
+
+    function updateStars(val) {
+        stars.forEach(function(st) {
+            var v = parseInt(st.getAttribute('data-val'), 10);
+            if (v <= val) {
+                st.style.color = '#fbbf24';
+                st.innerHTML = '<i class="fas fa-star"></i>';
+            } else {
+                st.style.color = '#cbd5e1';
+                st.innerHTML = '<i class="far fa-star"></i>';
+            }
+        });
+        if (labelText && labelsMap[val]) labelText.textContent = labelsMap[val];
+    }
+
+    stars.forEach(function(st) {
+        st.addEventListener('mouseenter', function() {
+            updateStars(parseInt(st.getAttribute('data-val'), 10));
+        });
+        st.addEventListener('click', function() {
+            var val = parseInt(st.getAttribute('data-val'), 10);
+            inputCalif.value = val;
+            updateStars(val);
+        });
+    });
+
+    starContainer.addEventListener('mouseleave', function() {
+        updateStars(parseInt(inputCalif.value, 10));
+    });
+})();
+
+function enviarResenaAlj(e) {
+    e.preventDefault();
+    var alojId = document.getElementById('resenaAljId').value;
+    var calif = document.getElementById('resenaCalifVal').value;
+    var coment = document.getElementById('resenaComentarioVal').value;
+    var alertBox = document.getElementById('resenaAlertBox');
+    var btnSubmit = document.getElementById('btnSubmitResena');
+
+    alertBox.style.display = 'none';
+    btnSubmit.disabled = true;
+    btnSubmit.textContent = 'Publicando...';
+
+    var fd = new FormData();
+    fd.append('alojamiento_id', alojId);
+    fd.append('calificacion', calif);
+    fd.append('comentario', coment);
+
+    fetch('/alojamiento/' + encodeURIComponent(alojId) + '/resena', {
+        method: 'POST',
+        body: fd
+    })
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+        btnSubmit.disabled = false;
+        btnSubmit.textContent = 'Publicar reseña';
+        if (data.success) {
+            alertBox.style.display = 'block';
+            alertBox.style.background = '#ecfdf5';
+            alertBox.style.color = '#047857';
+            alertBox.textContent = data.message;
+            setTimeout(function() {
+                window.location.reload();
+            }, 1200);
+        } else {
+            alertBox.style.display = 'block';
+            alertBox.style.background = '#fef2f2';
+            alertBox.style.color = '#dc2626';
+            alertBox.textContent = data.error || 'No se pudo guardar la reseña.';
+        }
+    })
+    .catch(function(err) {
+        btnSubmit.disabled = false;
+        btnSubmit.textContent = 'Publicar reseña';
+        alertBox.style.display = 'block';
+        alertBox.style.background = '#fef2f2';
+        alertBox.style.color = '#dc2626';
+        alertBox.textContent = 'Error de conexión. Por favor intenta de nuevo.';
+    });
+}
 </script>

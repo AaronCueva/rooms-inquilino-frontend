@@ -96,18 +96,41 @@ function pn_tipo_nombre($cod) {
             </div>
 
             <div class="pn-card">
-                <h2>Canjear puntos</h2>
-                <form method="POST" action="/puntos/canjear" id="pn-canje-form">
-                    <div class="pn-field">
-                        <label>Puntos a canjear</label>
-                        <input type="number" name="puntos_a_canjear" id="pn-cant" min="1" max="<?php echo (int)$pn_saldo; ?>" value="" placeholder="Ej. 100" required>
+                <h2><i class="fas fa-medal" style="color:var(--pd-primary);margin-right:6px"></i> Beneficios de tu Nivel</h2>
+                <p class="pn-meta" style="margin-top:0;margin-bottom:16px">
+                    Tus puntos construyen tu <strong>reputación digital</strong> en APP-ROOMS. A mayor nivel, mayores ventajas al postular a una habitación.
+                </p>
+
+                <div style="display:flex;flex-direction:column;gap:12px;margin-bottom:20px">
+                    <div style="background:var(--pd-bg);padding:12px 14px;border-radius:var(--pd-r-sm);border-left:3px solid var(--pd-primary)">
+                        <strong style="font-size:13.5px;color:var(--pd-ink)">⭐ Inquilino Confiable (1,000 pts)</strong>
+                        <div style="font-size:12.5px;color:var(--pd-muted);margin-top:4px">
+                            Desbloquea insignia destacada ante anfitriones y <strong>prioridad de aprobación inmediata</strong> sin requisitos extra.
+                        </div>
                     </div>
-                    <div class="pn-field">
-                        <label>Descripción (opcional)</label>
-                        <input type="text" name="descripcion" value="" placeholder="Motivo del canje" maxlength="120">
+                    <div style="background:var(--pd-bg);padding:12px 14px;border-radius:var(--pd-r-sm);border-left:3px solid var(--pd-accent)">
+                        <strong style="font-size:13.5px;color:var(--pd-ink)">👑 Embajador Nido (3,000 pts)</strong>
+                        <div style="font-size:12.5px;color:var(--pd-muted);margin-top:4px">
+                            Acceso preferencial a nuevas habitaciones verificadas y exención de costo de servicio en renovaciones.
+                        </div>
                     </div>
-                    <button type="submit" class="pn-btn">Canjear</button>
-                </form>
+                </div>
+
+                <h3 style="font-size:15px;margin:18px 0 10px;font-family:var(--pd-display)">¿Cómo ganar más puntos?</h3>
+                <div style="display:grid;grid-template-columns:1fr;gap:8px;font-size:13px">
+                    <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--pd-line)">
+                        <span>🤝 Invitar amigos universitarios</span>
+                        <strong class="pn-pos">+200 pts</strong>
+                    </div>
+                    <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--pd-line)">
+                        <span>📅 Pago puntual de alquiler mensual</span>
+                        <strong class="pn-pos">+100 pts</strong>
+                    </div>
+                    <div style="display:flex;justify-content:space-between;padding:8px 0">
+                        <span>✍️ Reseña verificada del alojamiento</span>
+                        <strong class="pn-pos">+50 pts</strong>
+                    </div>
+                </div>
             </div>
         </div>
 

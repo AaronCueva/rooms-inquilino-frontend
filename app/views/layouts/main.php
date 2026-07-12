@@ -53,6 +53,9 @@ $avatar_letras = strtoupper(
             <nav class="pd-nav">
                 <a href="/dashboard" class="pd-nav-link <?php echo (strpos($current_uri, '/dashboard') !== false) ? 'is-active' : ''; ?>">Dashboard</a>
                 <a href="/buscar" class="pd-nav-link <?php echo (strpos($current_uri, '/buscar') !== false) ? 'is-active' : ''; ?>">Buscar</a>
+                <a href="/reservas" class="pd-nav-link <?php echo (strpos($current_uri, '/reservas') !== false) ? 'is-active' : ''; ?>">Mis reservas</a>
+                <a href="/contratos" class="pd-nav-link <?php echo (strpos($current_uri, '/contratos') !== false || strpos($current_uri, '/contrato/') !== false) ? 'is-active' : ''; ?>">Mis contratos</a>
+                <a href="/pagos" class="pd-nav-link <?php echo (strpos($current_uri, '/pagos') !== false || strpos($current_uri, '/pago/') !== false) ? 'is-active' : ''; ?>">Mis Pagos</a>
                 <a href="/foros" class="pd-nav-link <?php echo (strpos($current_uri, '/foros') !== false) ? 'is-active' : ''; ?>">Comunidad</a>
                 <a href="/blog" class="pd-nav-link <?php echo (strpos($current_uri, '/blog') !== false) ? 'is-active' : ''; ?>">Blog</a>
                 <a href="/mensajes" class="pd-nav-link <?php echo (strpos($current_uri, '/mensajes') !== false) ? 'is-active' : ''; ?>" style="position:relative">Mensajes<?php if ($pdNoLeidos > 0): ?><span style="position:absolute;top:-6px;right:-12px;background:var(--pd-accent);color:#fff;font-size:10px;font-weight:700;min-width:17px;height:17px;border-radius:999px;display:inline-flex;align-items:center;justify-content:center;padding:0 4px"><?php echo $pdNoLeidos > 9 ? '9+' : $pdNoLeidos; ?></span><?php endif; ?></a>
@@ -66,27 +69,34 @@ $avatar_letras = strtoupper(
                         <a href="<?php echo htmlspecialchars($seccion['url']); ?>" class="pd-nav-link <?php echo (strpos($current_uri, $seccion['url']) !== false) ? 'is-active' : ''; ?>"><?php echo htmlspecialchars($seccion['nombre']); ?></a>
                     <?php endif; ?>
                 <?php endforeach; ?>
-
-                <a href="/logout" class="pd-nav-link" style="color:var(--pd-accent);font-weight:600"><i class="fas fa-sign-out-alt"></i> Cerrar sesión</a>
             </nav>
 
-            <!-- Avatar con dropdown (Perfil, Mis puntos, Referidos, Verificación) -->
-            <div class="dropdown">
-                <div class="pd-avatar-btn" data-bs-toggle="dropdown" aria-expanded="false" style="cursor:pointer">
-                    <?php if (!empty($foto_usuario)): ?>
-                        <img src="<?php echo htmlspecialchars($foto_usuario); ?>" alt="avatar">
-                    <?php else: ?>
-                        <span><?php echo htmlspecialchars($avatar_letras); ?></span>
-                    <?php endif; ?>
+            <div style="display:flex;align-items:center;gap:10px;">
+                <!-- Avatar con dropdown -->
+                <div class="dropdown">
+                    <div class="pd-avatar-btn" data-bs-toggle="dropdown" aria-expanded="false" style="cursor:pointer">
+                        <?php if (!empty($foto_usuario)): ?>
+                            <img src="<?php echo htmlspecialchars($foto_usuario); ?>" alt="avatar">
+                        <?php else: ?>
+                            <span><?php echo htmlspecialchars($avatar_letras); ?></span>
+                        <?php endif; ?>
+                    </div>
+                    <ul class="dropdown-menu dropdown-menu-end pd-dropdown">
+                        <li class="pd-dropdown-head"><?php echo htmlspecialchars($pd_nom . ' ' . $pd_ape); ?></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" href="/reservas"><i class="fas fa-calendar-check fa-sm fa-fw me-2"></i> Mis reservas</a></li>
+                        <li><a class="dropdown-item" href="/contratos"><i class="fas fa-file-contract fa-sm fa-fw me-2"></i> Mis contratos</a></li>
+                        <li><a class="dropdown-item" href="/perfil"><i class="fas fa-user fa-sm fa-fw me-2"></i> Mi perfil</a></li>
+                        <li><a class="dropdown-item" href="/puntos"><i class="fas fa-star fa-sm fa-fw me-2"></i> Mis puntos</a></li>
+                        <li><a class="dropdown-item" href="/referidos"><i class="fas fa-user-plus fa-sm fa-fw me-2"></i> Referidos</a></li>
+                        <li><a class="dropdown-item" href="/perfil/verificar"><i class="fas fa-id-card fa-sm fa-fw me-2"></i> Verificación</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" style="color:#e11d48;font-weight:600;" href="/logout"><i class="fas fa-sign-out-alt fa-sm fa-fw me-2"></i> Cerrar sesión</a></li>
+                    </ul>
                 </div>
-                <ul class="dropdown-menu dropdown-menu-end pd-dropdown">
-                    <li class="pd-dropdown-head"><?php echo htmlspecialchars($pd_nom . ' ' . $pd_ape); ?></li>
-                    <li><hr class="dropdown-divider"></li>
-                    <li><a class="dropdown-item" href="/perfil"><i class="fas fa-user fa-sm fa-fw me-2"></i> Mi perfil</a></li>
-                    <li><a class="dropdown-item" href="/puntos"><i class="fas fa-star fa-sm fa-fw me-2"></i> Mis puntos</a></li>
-                    <li><a class="dropdown-item" href="/referidos"><i class="fas fa-user-plus fa-sm fa-fw me-2"></i> Referidos</a></li>
-                    <li><a class="dropdown-item" href="/perfil/verificar"><i class="fas fa-id-card fa-sm fa-fw me-2"></i> Verificación</a></li>
-                </ul>
+
+                <!-- Botón rápido de salida circular -->
+                <a href="/logout" title="Cerrar sesión" style="width:38px;height:38px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;background:#fff1f2;color:#e11d48;border:1px solid #fecdd3;text-decoration:none;transition:all .2s;"><i class="fas fa-sign-out-alt"></i></a>
             </div>
         </div>
     </div>
@@ -121,6 +131,8 @@ $avatar_letras = strtoupper(
                 <h6>Mi cuenta</h6>
                 <ul>
                     <li><a href="/perfil">Mi perfil</a></li>
+                    <li><a href="/reservas">Mis reservas</a></li>
+                    <li><a href="/contratos">Mis contratos</a></li>
                     <li><a href="/puntos">Mis puntos</a></li>
                     <li><a href="/referidos">Referidos</a></li>
                     <li><a href="/mensajes">Mensajes</a></li>
