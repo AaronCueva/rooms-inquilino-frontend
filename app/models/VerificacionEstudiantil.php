@@ -156,6 +156,38 @@ class VerificacionEstudiantil
     }
 
     /**
+     * Guarda la URL del documento de verificación en usuario.url_verificacion_estudiante.
+     * Se llama al subir un carnet/constancia: deja constancia de qué documento está
+     * en revisión (la aprobación la hace admin en rooms-frontend).
+     */
+    public function guardarUrlVerificacion(string $usuario_id, string $url): bool
+    {
+        $sql = "UPDATE usuario SET url_verificacion_estudiante = :url, modificado = now()
+                WHERE usuario_id = :u";
+        $stmt = $this->db->prepare($sql);
+        $stmt->bindValue(':url', $url);
+        $stmt->bindValue(':u', $usuario_id);
+        return $stmt->execute();
+    }
+
+    /**
+     * Estado de verificación para la vista:
+     *  - 'verificado'   : usuario.verificado = true
+     *  - 'en_revision'  : tiene url_verificacion_estudiante pero verificado = false
+     *  - 'pendiente'    : sin documento y sin verificar
+     */
+    public function estadoVerificacion(array $usuario): string
+    {
+        if (!empty($usuario['verificado'])) {
+            return 'verificado';
+        }
+        if (!empty($usuario['url_verificacion_estudiante'])) {
+            return 'en_revision';
+        }
+        return 'pendiente';
+    }
+
+    /**
      * Marca que el estudiante solicitó verificación de identidad.
      *
      * v1: no hay columna de "solicitud pendiente" en usuario. La verificación la
