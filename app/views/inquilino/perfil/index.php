@@ -52,7 +52,7 @@ $pf_iniciales .= strtoupper($pf_mb ? mb_substr($pf_apellido, 0, 1) : substr($pf_
         <!-- FORM EDITABLE -->
         <div class="pf-card">
             <h2><i class="fas fa-user-edit" style="color:var(--pd-primary)"></i> Información editable</h2>
-            <form method="POST" action="/perfil">
+            <form method="POST" action="/perfil" enctype="multipart/form-data">
                 <div class="pf-row">
                     <div class="pf-field">
                         <label>Nombres</label>
@@ -116,8 +116,20 @@ $pf_iniciales .= strtoupper($pf_mb ? mb_substr($pf_apellido, 0, 1) : substr($pf_
                     <input type="text" name="pais_origen" value="<?php echo htmlspecialchars($pf_u['pais_origen'] ?? ''); ?>" placeholder="Ej. Perú">
                 </div>
                 <div class="pf-field">
-                    <label>URL de foto</label>
-                    <input type="text" name="url_foto" value="<?php echo htmlspecialchars($pf_u['url_foto'] ?? ''); ?>" placeholder="https://… (foto de perfil)">
+                    <label>Foto de perfil</label>
+                    <div style="display:flex; align-items:center; gap:16px; flex-wrap:wrap;">
+                        <?php if (!empty($pf_u['url_foto'])): ?>
+                            <img id="preview-foto" src="<?php echo htmlspecialchars($pf_u['url_foto']); ?>" alt="Foto de perfil" style="width:72px;height:72px;border-radius:999px;object-fit:cover;border:1px solid var(--pd-line);">
+                        <?php else: ?>
+                            <div id="preview-foto-placeholder" style="width:72px;height:72px;border-radius:999px;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,var(--pd-primary),var(--pd-ink));color:#fff;font-weight:700;font-size:20px;"><?php echo htmlspecialchars($pf_iniciales); ?></div>
+                            <img id="preview-foto" src="" alt="Foto de perfil" class="d-none" style="width:72px;height:72px;border-radius:999px;object-fit:cover;border:1px solid var(--pd-line);">
+                        <?php endif; ?>
+                        <label class="pd-btn pd-btn-ghost" for="foto_perfil" style="cursor:pointer; margin:0;">
+                            <i class="fas fa-camera"></i> Cambiar foto
+                        </label>
+                        <input type="file" id="foto_perfil" name="foto_perfil" class="d-none" accept="image/png, image/jpeg, image/webp">
+                        <span class="text-muted" style="font-size:12px;">JPG, PNG o WEBP · máx 10 MB</span>
+                    </div>
                 </div>
                 <div class="pf-field">
                     <label>Descripción / bio</label>
@@ -125,7 +137,7 @@ $pf_iniciales .= strtoupper($pf_mb ? mb_substr($pf_apellido, 0, 1) : substr($pf_
                 </div>
                 <div class="pf-actions">
                     <button type="submit" class="pd-btn pd-btn-primary"><i class="fas fa-save"></i> Guardar cambios</button>
-                    <a href="/perfil/verificacion" class="pd-btn pd-btn-ghost"><i class="fas fa-shield-alt"></i> Verificación</a>
+                    <a href="/perfil/verificar" class="pd-btn pd-btn-ghost"><i class="fas fa-shield-alt"></i> Verificación</a>
                 </div>
             </form>
         </div>
@@ -183,3 +195,25 @@ $pf_iniciales .= strtoupper($pf_mb ? mb_substr($pf_apellido, 0, 1) : substr($pf_
         </div>
     </div>
 </section>
+
+<script>
+(function () {
+    var input = document.getElementById('foto_perfil');
+    if (!input) return;
+    input.addEventListener('change', function (e) {
+        if (e.target.files && e.target.files[0]) {
+            var reader = new FileReader();
+            reader.onload = function (ev) {
+                var img = document.getElementById('preview-foto');
+                var ph  = document.getElementById('preview-foto-placeholder');
+                if (img) {
+                    img.src = ev.target.result;
+                    img.classList.remove('d-none');
+                }
+                if (ph) { ph.classList.add('d-none'); }
+            };
+            reader.readAsDataURL(e.target.files[0]);
+        }
+    });
+})();
+</script>

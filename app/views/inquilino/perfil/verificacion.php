@@ -49,8 +49,18 @@ $pf_inst = !empty($esInstitucional);
             <h2><i class="fas fa-shield-alt" style="color:var(--pd-primary)"></i> Estado actual</h2>
             <p class="pf-card-sub">Tu estado de verificación como estudiante universitario.</p>
 
-            <?php if ($pf_verificado): ?>
+            <?php
+            $pf_estado = 'pendiente';
+            if (!empty($pf_u['verificado'])) {
+                $pf_estado = 'verificado';
+            } elseif (!empty($pf_u['url_verificacion_estudiante'])) {
+                $pf_estado = 'en_revision';
+            }
+            ?>
+            <?php if ($pf_estado === 'verificado'): ?>
                 <span class="pf-status pf-status-ok"><i class="fas fa-check-circle"></i> Estudiante verificado</span>
+            <?php elseif ($pf_estado === 'en_revision'): ?>
+                <span class="pf-status pf-status-wait"><i class="fas fa-hourglass-half"></i> Documento en revisión</span>
             <?php else: ?>
                 <span class="pf-status pf-status-wait"><i class="fas fa-clock"></i> Verificación pendiente</span>
             <?php endif; ?>
@@ -83,7 +93,7 @@ $pf_inst = !empty($esInstitucional);
             <h2><i class="fas fa-file-upload" style="color:var(--pd-primary)"></i> Subir carnet / constancia</h2>
             <p class="pf-card-sub">Sube una foto clara de tu carnet universitario o constancia de estudios vigente.</p>
 
-            <form method="POST" action="/perfil/verificacion/subir" enctype="multipart/form-data">
+            <form method="POST" action="/perfil/verificar/subir" enctype="multipart/form-data">
                 <div class="pf-field">
                     <label>Archivo (PDF, JPG, PNG)</label>
                     <input type="file" name="documento" accept=".pdf,.jpg,.jpeg,.png" required>

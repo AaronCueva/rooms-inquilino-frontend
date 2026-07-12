@@ -1,0 +1,12 @@
+[2026-07-12 17:01:10] Iniciando uploadFile: local=C:\Users\aaron\AppData\Local\Temp\php6BB0.tmp, dest=usuarios/perfil_5106739d-6937-4ebb-a0c7-d1a51f6eb007_1783875670.png, mime=image/png
+[2026-07-12 17:01:10] Archivo leido correctamente. Size: 77933
+[2026-07-12 17:01:10] Usando cURL...
+[2026-07-12 17:01:12] ÉXITO cURL! HTTP 201
+[2026-07-12 17:14:39] Iniciando uploadFile: local=C:\Users\aaron\AppData\Local\Temp\phpBC29.tmp, dest=verificacion/doc_5106739d-6937-4ebb-a0c7-d1a51f6eb007_1783876479.pdf, mime=application/pdf
+[2026-07-12 17:14:39] Archivo leido correctamente. Size: 83612
+[2026-07-12 17:14:39] Usando cURL...
+[2026-07-12 17:14:41] ÉXITO cURL! HTTP 201
+[2026-07-12 17:15:40] Iniciando uploadFile: local=C:\Users\aaron\AppData\Local\Temp\phpA968.tmp, dest=verificacion/doc_5106739d-6937-4ebb-a0c7-d1a51f6eb007_1783876540.pdf, mime=application/pdf
+[2026-07-12 17:15:40] Archivo leido correctamente. Size: 388212
+[2026-07-12 17:15:40] Usando cURL...
+[2026-07-12 17:15:44] ÉXITO cURL! HTTP 201
