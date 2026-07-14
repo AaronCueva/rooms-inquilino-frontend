@@ -44,6 +44,7 @@ class Pago
                 WHERE r.usuario_id = :u
                   AND p.habilitado = true
                   AND c.habilitado = true
+                  AND (c.estado_codigo = 'ESCO001' OR p.estado_codigo = 'ESPG003')
                 ORDER BY p.estado_codigo ASC, p.fecha_vencimiento ASC, p.numero_cuota ASC";
 
         $stmt = $this->db->prepare($sql);
@@ -81,8 +82,8 @@ class Pago
      */
     public function generarCuotasContrato(string $contrato_id, int $duracion_meses, float $monto_renta, string $fecha_inicio, string $usuario_id): int
     {
-        // Verificar si ya tiene cuotas
-        $chk = $this->db->prepare("SELECT COUNT(*) FROM pago WHERE contrato_id = :c AND habilitado = true");
+        // Verificar si ya tiene cuotas (activas o anuladas — no regenerar si ya existen)
+        $chk = $this->db->prepare("SELECT COUNT(*) FROM pago WHERE contrato_id = :c");
         $chk->bindValue(':c', $contrato_id);
         $chk->execute();
         if ((int)$chk->fetchColumn() > 0) {

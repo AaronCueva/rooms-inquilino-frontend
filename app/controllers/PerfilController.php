@@ -70,6 +70,46 @@ class PerfilController extends Controller
         $uid = $_SESSION['usuario_id'];
         $campos = $this->leerCamposPerfil($_POST);
 
+        // Subida de foto de perfil — Azure Blob Storage (espejo de rooms-propietario-frontend)
+        if (!empty($_FILES['foto_perfil']['name'])) {
+            $maxSize = 10 * 1024 * 1024; // 10MB
+            $ext = strtolower(pathinfo($_FILES['foto_perfil']['name'], PATHINFO_EXTENSION));
+            $allowed = ['jpg', 'jpeg', 'png', 'webp', 'gif', 'jfif'];
+
+            if ($_FILES['foto_perfil']['error'] !== UPLOAD_ERR_OK) {
+                $this->setFlash('error', 'Error en la subida de la imagen. Código PHP: ' . $_FILES['foto_perfil']['error']);
+                $this->redirect('/perfil');
+            } elseif ($_FILES['foto_perfil']['size'] > $maxSize) {
+                $this->setFlash('error', 'La foto supera el tamaño máximo de 10 MB.');
+                $this->redirect('/perfil');
+            } elseif (!in_array($ext, $allowed)) {
+                $this->setFlash('error', 'Formato no válido. Solo JPG, PNG, WEBP o GIF.');
+                $this->redirect('/perfil');
+            } else {
+                $newName = 'usuarios/perfil_' . $uid . '_' . time() . '.' . $ext;
+                $mimeType = function_exists('mime_content_type')
+                    ? mime_content_type($_FILES['foto_perfil']['tmp_name'])
+                    : 'image/jpeg';
+                if (!$mimeType) {
+                    $mimeType = 'image/jpeg';
+                }
+
+                $azureUrl = \App\Core\AzureStorage::uploadFile($_FILES['foto_perfil']['tmp_name'], $newName, $mimeType);
+                if (!$azureUrl) {
+                    // Fallback local si Azure falla o no está configurado
+                    $azureUrl = \App\Core\AzureStorage::uploadFileLocal($_FILES['foto_perfil']['tmp_name'], $newName);
+                }
+
+                if ($azureUrl) {
+                    $campos['url_foto'] = $azureUrl;    // whitelist de guardarPerfil incluye url_foto
+                    $_SESSION['url_foto'] = $azureUrl;  // refresca avatar del header
+                } else {
+                    $this->setFlash('error', 'No se pudo guardar la imagen (ni en Azure ni en almacenamiento local).');
+                    $this->redirect('/perfil');
+                }
+            }
+        }
+
         $modelo = new VerificacionEstudiantil();
         $ok = $modelo->guardarPerfil($uid, $campos);
 
@@ -119,20 +159,25 @@ class PerfilController extends Controller
         $url = null;
         $nombre = null;
 
-        // Upload real vía $_FILES
+        // Upload real vía $_FILES → Azure Blob Storage (con fallback local)
         if (!empty($_FILES['documento']['name']) && ($_FILES['documento']['error'] ?? UPLOAD_ERR_NO_FILE) === UPLOAD_ERR_OK) {
-            $dir = __DIR__ . '/../../public/uploads/verificacion';
-            if (!is_dir($dir)) {
-                @mkdir($dir, 0775, true);
+            $ext = strtolower(pathinfo($_FILES['documento']['name'], PATHINFO_EXTENSION));
+            $allowed = ['jpg', 'jpeg', 'png', 'webp', 'gif', 'pdf'];
+            if (!in_array($ext, $allowed)) {
+                $this->setFlash('error', 'Formato no válido. Solo JPG, PNG, WEBP, GIF o PDF.');
+                $this->redirect('/perfil/verificar');
             }
-            $ext = pathinfo($_FILES['documento']['name'], PATHINFO_EXTENSION);
-            $ext = preg_replace('/[^a-zA-Z0-9]/', '', $ext);
+
             $basename = pathinfo($_FILES['documento']['name'], PATHINFO_FILENAME);
             $nombre = $basename . '.' . $ext;
-            $filename = $uid . '_' . time() . '.' . $ext;
-            $dest = $dir . '/' . $filename;
-            if (move_uploaded_file($_FILES['documento']['tmp_name'], $dest)) {
-                $url = '/public/uploads/verificacion/' . $filename;
+            $newName = 'verificacion/doc_' . $uid . '_' . time() . '.' . $ext;
+            $mimeType = function_exists('mime_content_type')
+                ? mime_content_type($_FILES['documento']['tmp_name'])
+                : 'application/octet-stream';
+
+            $url = \App\Core\AzureStorage::uploadFile($_FILES['documento']['tmp_name'], $newName, $mimeType);
+            if (!$url) {
+                $url = \App\Core\AzureStorage::uploadFileLocal($_FILES['documento']['tmp_name'], $newName);
             }
         }
 
@@ -144,16 +189,18 @@ class PerfilController extends Controller
 
         if (!$url) {
             $this->setFlash('error', 'No se recibió ningún documento.');
-            $this->redirect('/perfil/verificacion');
+            $this->redirect('/perfil/verificar');
         }
 
         $id = $verifModel->subirDocumento($uid, $url, $nombre ?: 'documento');
         if ($id) {
+            // Persistir también en usuario.url_verificacion_estudiante (lo revisa el admin)
+            $verifModel->guardarUrlVerificacion($uid, $url);
             $this->setFlash('success', 'Documento subido. Queda pendiente de revisión por el equipo Nido.');
         } else {
             $this->setFlash('error', 'No se pudo registrar el documento. Inténtalo de nuevo.');
         }
-        $this->redirect('/perfil/verificacion');
+        $this->redirect('/perfil/verificar');
     }
 
     /**

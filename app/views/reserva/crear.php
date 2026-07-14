@@ -72,6 +72,13 @@ $rv_old_obs = htmlspecialchars($rv_old['observacion'] ?? '', ENT_QUOTES, 'UTF-8'
   .rv-total { display: flex; justify-content: space-between; padding: 12px 0 2px; font-size: 16px; font-weight: 700; color: var(--pd-ink); }
   .rv-total span:last-child { font-family: var(--pd-display); }
   @media (max-width: 900px) { .rv-side { position: static; } }
+
+  /* Anfitrión */
+  .rv-prop { display: flex; align-items: center; gap: 12px; padding: 12px 0; margin: 14px 0; border-top: 1px solid var(--pd-line); border-bottom: 1px solid var(--pd-line); }
+  .rv-prop .rv-prop-av { width: 44px; height: 44px; border-radius: 50%; object-fit: cover; background: linear-gradient(135deg, var(--pd-primary), #7B8CFF); color: #fff; display: grid; place-items: center; font-weight: 700; font-size: 16px; flex-shrink: 0; }
+  .rv-prop b { font-size: 14px; display: block; }
+  .rv-prop .rv-prop-meta { font-size: 12px; color: var(--pd-muted); margin-top: 2px; }
+  .rv-prop .rv-verified { display: inline-flex; align-items: center; gap: 4px; background: #ecfdf5; color: #047857; border: 1px solid #a7f3d0; padding: 2px 8px; border-radius: 999px; font-size: 11px; font-weight: 700; margin-left: 6px; }
 </style>
 
 <section class="rv-wrap">
@@ -154,6 +161,24 @@ $rv_old_obs = htmlspecialchars($rv_old['observacion'] ?? '', ENT_QUOTES, 'UTF-8'
                 <div class="rv-side-body">
                     <div class="rv-side-title"><?php echo $rv_titulo; ?></div>
                     <a class="rv-side-link" href="/alojamiento/<?php echo urlencode($rv_id); ?>">Ver ficha completa</a>
+
+                    <?php
+                        $rv_propFoto = trim($rv_a['propietario_foto'] ?? '');
+                        $rv_propNom  = htmlspecialchars(($rv_a['propietario_nombres'] ?? '') . ' ' . strtoupper(pd_initial($rv_a['propietario_apellido'] ?? '')) . '.', ENT_QUOTES, 'UTF-8');
+                        $rv_propVerif = !empty($rv_a['propietario_verificado']) && in_array((string)$rv_a['propietario_verificado'], ['1','true','t','TRUE','T'], true);
+                    ?>
+                    <div class="rv-prop">
+                        <?php if ($rv_propFoto !== ''): ?>
+                            <img class="rv-prop-av" src="<?php echo htmlspecialchars($rv_propFoto, ENT_QUOTES, 'UTF-8'); ?>" alt="" onerror="this.style.display='none';var s=document.createElement('span');s.className='rv-prop-av';s.textContent='<?php echo htmlspecialchars(strtoupper(pd_initial($rv_a['propietario_nombres'] ?? 'A')), ENT_QUOTES, 'UTF-8'); ?>';this.parentNode.insertBefore(s,this);">
+                        <?php else: ?>
+                            <span class="rv-prop-av"><?php echo htmlspecialchars(strtoupper(pd_initial($rv_a['propietario_nombres'] ?? 'A'))); ?></span>
+                        <?php endif; ?>
+                        <div style="flex:1;min-width:0">
+                            <b><?php echo $rv_propNom; ?></b><?php if ($rv_propVerif): ?> <span class="rv-verified"><i class="fas fa-check"></i> Verificado</span><?php endif; ?>
+                            <div class="rv-prop-meta">Anfitrión</div>
+                        </div>
+                    </div>
+
                     <div class="rv-side-price"><?php echo $rv_mon . ' ' . number_format($rv_precio, 0, ',', '.'); ?> <small>/ mes</small></div>
 
                     <div id="rvResumen">

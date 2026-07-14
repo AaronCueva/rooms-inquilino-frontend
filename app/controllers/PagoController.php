@@ -34,9 +34,13 @@ class PagoController extends Controller
         $pagoModel = new Pago();
         $contratoModel = new Contrato();
 
-        // 1. Asegurar que cada contrato del usuario tenga sus cuotas mensuales generadas
+        // 1. Asegurar que cada contrato ACTIVO del usuario tenga sus cuotas mensuales generadas
         $contratos = $contratoModel->misContratos($uid, 1, 50);
         foreach ($contratos as $c) {
+            // No generar cuotas para contratos finalizados/cancelados
+            if (($c['estado_codigo'] ?? '') !== Contrato::EST_ACTIVO) {
+                continue;
+            }
             $duracion = $this->calcularDuracionMeses($c['fecha_inicio'] ?? null, $c['fecha_fin'] ?? null);
             $pagoModel->generarCuotasContrato(
                 $c['contrato_id'],
@@ -102,10 +106,16 @@ class PagoController extends Controller
     /**
      * POST /pago/{id}/simular — Simulación de transacción de pago.
      */
-    public function simular($pago_id)
+    public function simular($id = null)
     {
         $uid = $_SESSION['usuario_id'];
         $pagoModel = new Pago();
+
+        $pago_id = $id ?? ($_GET['id'] ?? null);
+        if (!$pago_id) {
+            $this->devolverRespuesta(false, 'Cuota no encontrada o no autorizada.');
+            return;
+        }
 
         $pago = $pagoModel->obtenerPorId($pago_id, $uid);
         if (!$pago) {

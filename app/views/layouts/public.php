@@ -168,7 +168,7 @@ if ($_pd_logueado) {
     </footer>
 
     <!-- Floating chat -->
-    <a href="https://wa.me/51999999999" class="pd-chat" target="_blank" rel="noopener" title="Chat de soporte"><i class="fab fa-whatsapp"></i></a>
+    <a href="https://wa.me/51913039208" class="pd-chat" target="_blank" rel="noopener" title="Chat de soporte"><i class="fab fa-whatsapp"></i></a>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
