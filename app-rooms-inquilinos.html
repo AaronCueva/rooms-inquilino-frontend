@@ -1,0 +1,971 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>APP-ROOMS · Inquilinos</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#15161B;
+    --ink-soft:#5B5F6B;
+    --ink-faint:#9499A3;
+    --navy:#161B2C;
+    --navy-soft:#232944;
+    --red:#DC2626;
+    --red-dark:#B91C1C;
+    --red-wash:#FDEAEA;
+    --gold:#B68A3C;
+    --gold-wash:#F6EEDC;
+    --paper:#FAF8F4;
+    --surface:#FFFFFF;
+    --line:#E9E5DC;
+    --line-soft:#F1EEE7;
+    --blue:#2F6FED; --blue-wash:#EAF0FE;
+    --green:#16A34A; --green-wash:#E9F8EF;
+    --amber:#D97706; --amber-wash:#FCF1E2;
+    --teal:#0EA5B7; --teal-wash:#E6F8FA;
+    --radius-lg:20px;
+    --radius-md:14px;
+    --radius-sm:10px;
+    --shadow-card:0 1px 2px rgba(20,20,25,.04), 0 8px 24px -12px rgba(20,20,25,.10);
+    --shadow-pop:0 12px 32px -8px rgba(20,20,25,.18);
+    --font-display:'Manrope',sans-serif;
+    --font-body:'Inter',sans-serif;
+    --font-mono:'IBM Plex Mono',monospace;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    font-family:var(--font-body);
+    color:var(--ink);
+    background:var(--paper);
+    -webkit-font-smoothing:antialiased;
+  }
+  h1,h2,h3,h4,.display{font-family:var(--font-display);color:var(--ink);margin:0;letter-spacing:-0.01em;}
+  p{margin:0;}
+  button{font-family:inherit;cursor:pointer;}
+  a{text-decoration:none;color:inherit;}
+  .mono{font-family:var(--font-mono);}
+  .view{display:none;}
+  .view.active{display:block;}
+  ::selection{background:var(--red);color:#fff;}
+
+  /* ---------- buttons & chips ---------- */
+  .btn{
+    display:inline-flex;align-items:center;justify-content:center;gap:8px;
+    border:none;border-radius:999px;padding:13px 24px;
+    font-family:var(--font-display);font-weight:700;font-size:14.5px;
+    transition:transform .12s ease, box-shadow .12s ease, background .15s ease;
+  }
+  .btn:active{transform:scale(.98);}
+  .btn-primary{background:var(--red);color:#fff;box-shadow:0 8px 20px -8px rgba(220,38,38,.55);}
+  .btn-primary:hover{background:var(--red-dark);}
+  .btn-dark{background:var(--navy);color:#fff;}
+  .btn-dark:hover{background:var(--navy-soft);}
+  .btn-ghost{background:transparent;color:var(--ink);border:1.5px solid var(--line);}
+  .btn-ghost:hover{border-color:var(--ink-faint);}
+  .btn-block{width:100%;}
+  .btn-sm{padding:9px 16px;font-size:13px;}
+
+  .chip{
+    display:inline-flex;align-items:center;gap:6px;
+    padding:8px 16px;border-radius:999px;border:1.5px solid var(--line);
+    font-size:13.5px;font-weight:600;color:var(--ink-soft);background:#fff;
+    white-space:nowrap;
+  }
+  .chip.is-active{background:var(--navy);color:#fff;border-color:var(--navy);}
+  .badge{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:999px;font-size:12px;font-weight:700;font-family:var(--font-display);}
+  .badge-green{background:var(--green-wash);color:var(--green);}
+  .badge-amber{background:var(--amber-wash);color:var(--amber);}
+  .badge-red{background:var(--red-wash);color:var(--red);}
+  .badge-gold{background:var(--gold-wash);color:var(--gold);}
+  .badge-blue{background:var(--blue-wash);color:var(--blue);}
+
+  /* ---------- icons ---------- */
+  svg.ic{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0;}
+
+  /* ===================================================================
+     AUTH VIEWS (login / register)
+  ==================================================================== */
+  .auth-view{min-height:100vh;position:relative;display:flex;align-items:center;justify-content:center;padding:24px;
+    background:
+      repeating-linear-gradient(0deg, rgba(255,255,255,.045) 0 2px, transparent 2px 56px),
+      repeating-linear-gradient(90deg, rgba(255,255,255,.045) 0 2px, transparent 2px 72px),
+      radial-gradient(900px 500px at 18% 12%, rgba(220,38,38,.20), transparent 60%),
+      radial-gradient(700px 500px at 86% 84%, rgba(182,138,60,.18), transparent 60%),
+      linear-gradient(165deg, var(--navy) 0%, #0D1020 100%);
+  }
+  .auth-mark{position:absolute;top:40px;left:48px;display:flex;align-items:center;gap:10px;color:#fff;}
+  .auth-mark .logo-box{width:34px;height:34px;border-radius:9px;background:var(--red);display:flex;align-items:center;justify-content:center;}
+  .auth-mark .logo-box svg{width:18px;height:18px;stroke:#fff;}
+  .auth-mark .wordmark{font-family:var(--font-display);font-weight:800;font-size:18px;letter-spacing:-.01em;}
+  .auth-mark .wordmark span{color:var(--red);}
+  .auth-key-illustration{position:absolute;right:64px;bottom:64px;opacity:.9;}
+  .auth-card{
+    position:relative;z-index:2;background:var(--surface);border-radius:24px;
+    width:100%;max-width:420px;padding:40px 36px 32px;box-shadow:var(--shadow-pop);
+  }
+  .auth-card .wordmark{font-family:var(--font-display);font-weight:800;font-size:22px;margin-bottom:22px;}
+  .auth-card .wordmark span{color:var(--red);}
+  .auth-eyebrow{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--gold);margin-bottom:8px;}
+  .auth-card h1{font-size:24px;font-weight:800;margin-bottom:6px;}
+  .auth-sub{color:var(--ink-soft);font-size:14px;margin-bottom:26px;}
+  .field{margin-bottom:16px;}
+  .field label{display:block;font-size:13px;font-weight:600;margin-bottom:7px;color:var(--ink);}
+  .field label .req{color:var(--red);}
+  .field input,.field select{
+    width:100%;padding:12px 14px;border-radius:11px;border:1.5px solid var(--line);
+    background:#FBFAF8;font-size:14.5px;font-family:var(--font-body);color:var(--ink);
+  }
+  .field input:focus,.field select:focus{outline:none;border-color:var(--red);background:#fff;}
+  .field-pw{position:relative;}
+  .field-pw svg{position:absolute;right:14px;top:13px;color:var(--ink-faint);}
+  .terms{font-size:12.5px;color:var(--ink-faint);margin:14px 0 18px;line-height:1.5;}
+  .terms a{color:var(--red);font-weight:600;}
+  .auth-footer{display:flex;justify-content:center;gap:6px;margin-top:18px;font-size:13.5px;color:var(--ink-soft);}
+  .auth-footer a{color:var(--red);font-weight:700;}
+  .steps-row{display:flex;align-items:center;gap:8px;margin-bottom:24px;}
+  .step-dot{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--font-display);font-weight:700;font-size:13px;background:var(--line-soft);color:var(--ink-faint);}
+  .step-dot.is-done{background:var(--green);color:#fff;}
+  .step-dot.is-active{background:var(--red);color:#fff;}
+  .step-line{flex:1;height:2px;background:var(--line);}
+  .step-line.is-done{background:var(--green);}
+  .upload-box{border:1.5px dashed var(--line);border-radius:14px;padding:22px;text-align:center;background:#FBFAF8;margin-bottom:18px;}
+  .upload-box svg{color:var(--ink-faint);margin-bottom:8px;}
+  .upload-box .ub-title{font-weight:700;font-size:14px;margin-bottom:3px;}
+  .upload-box .ub-sub{font-size:12.5px;color:var(--ink-faint);}
+  .verify-note{display:flex;gap:10px;background:var(--gold-wash);border-radius:12px;padding:12px 14px;font-size:12.5px;color:#7A5C20;margin-bottom:20px;line-height:1.5;}
+  .verify-note svg{color:var(--gold);flex-shrink:0;margin-top:1px;}
+
+  /* ===================================================================
+     APP SHELL
+  ==================================================================== */
+  .app-shell{display:none;min-height:100vh;}
+  .app-shell.active{display:block;}
+  .topbar{
+    position:sticky;top:0;z-index:30;display:flex;align-items:center;gap:28px;
+    background:#fff;border-bottom:1px solid var(--line);padding:14px 32px;
+  }
+  .topbar .wordmark{font-family:var(--font-display);font-weight:800;font-size:18px;display:flex;align-items:center;gap:9px;}
+  .topbar .wordmark span{color:var(--red);}
+  .topbar .logo-box{width:30px;height:30px;border-radius:8px;background:var(--red);display:flex;align-items:center;justify-content:center;}
+  .topbar .logo-box svg{width:16px;height:16px;stroke:#fff;}
+  .nav-links{display:flex;align-items:center;gap:4px;flex:1;}
+  .nav-link{
+    display:flex;align-items:center;gap:7px;padding:9px 14px;border-radius:10px;
+    font-size:13.5px;font-weight:600;color:var(--ink-soft);background:transparent;border:none;
+  }
+  .nav-link:hover{background:var(--line-soft);}
+  .nav-link.is-active{background:var(--navy);color:#fff;}
+  .topbar-actions{display:flex;align-items:center;gap:14px;}
+  .icon-btn{position:relative;width:38px;height:38px;border-radius:10px;border:1.5px solid var(--line);background:#fff;display:flex;align-items:center;justify-content:center;color:var(--ink-soft);}
+  .icon-btn:hover{border-color:var(--ink-faint);}
+  .icon-btn .dot{position:absolute;top:7px;right:7px;width:7px;height:7px;border-radius:50%;background:var(--red);border:1.5px solid #fff;}
+  .avatar-chip{display:flex;align-items:center;gap:9px;padding:5px 12px 5px 5px;border-radius:999px;border:1.5px solid var(--line);background:#fff;}
+  .avatar-chip:hover{border-color:var(--ink-faint);}
+  .avatar-circle{width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,var(--gold),#D8B873);display:flex;align-items:center;justify-content:center;font-family:var(--font-display);font-weight:800;font-size:12.5px;color:#fff;}
+  .avatar-chip .av-name{font-size:13px;font-weight:700;}
+
+  .page{max-width:1180px;margin:0 auto;padding:32px 32px 64px;}
+  .page-head{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:14px;}
+  .page-head .eyebrow{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--red);margin-bottom:6px;}
+  .page-head h1{font-size:27px;font-weight:800;}
+  .page-head .sub{color:var(--ink-soft);font-size:14px;margin-top:4px;}
+
+  .card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius-lg);box-shadow:var(--shadow-card);}
+
+  /* stat row (echoes admin dashboard stat cards) */
+  .stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:28px;}
+  .stat-card{background:#fff;border:1px solid var(--line);border-radius:var(--radius-md);padding:18px 18px;display:flex;flex-direction:column;gap:10px;}
+  .stat-icon{width:38px;height:38px;border-radius:11px;display:flex;align-items:center;justify-content:center;}
+  .stat-label{font-size:11px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--ink-faint);}
+  .stat-value{font-family:var(--font-display);font-weight:800;font-size:22px;}
+  .stat-foot{font-size:12px;color:var(--ink-faint);}
+
+  /* ---------------- EXPLORE ---------------- */
+  .hero-search{
+    position:relative;border-radius:24px;overflow:hidden;padding:46px 40px;margin-bottom:30px;
+    background:
+      repeating-linear-gradient(0deg, rgba(255,255,255,.05) 0 2px, transparent 2px 50px),
+      repeating-linear-gradient(90deg, rgba(255,255,255,.05) 0 2px, transparent 2px 64px),
+      radial-gradient(700px 360px at 85% -10%, rgba(220,38,38,.30), transparent 60%),
+      radial-gradient(500px 360px at 5% 110%, rgba(182,138,60,.22), transparent 60%),
+      linear-gradient(155deg, var(--navy), #0D1020);
+    color:#fff;
+  }
+  .hero-search h1{font-size:30px;font-weight:800;max-width:520px;line-height:1.25;}
+  .hero-search .sub{color:#C7CAD6;font-size:14.5px;margin-top:10px;max-width:480px;}
+  .search-bar{margin-top:26px;background:#fff;border-radius:16px;padding:8px;display:flex;gap:8px;box-shadow:var(--shadow-pop);max-width:780px;}
+  .search-bar .seg{flex:1;display:flex;flex-direction:column;gap:2px;padding:8px 16px;border-right:1px solid var(--line-soft);}
+  .search-bar .seg:last-of-type{border-right:none;}
+  .search-bar .seg label{font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--ink-faint);}
+  .search-bar .seg input,.search-bar .seg select{border:none;font-family:var(--font-body);font-size:13.5px;font-weight:600;color:var(--ink);background:transparent;padding:0;width:100%;}
+  .search-bar .seg input:focus,.search-bar .seg select:focus{outline:none;}
+  .search-bar .btn-primary{flex-shrink:0;padding:0 22px;border-radius:11px;}
+
+  .filter-row{display:flex;gap:10px;margin-bottom:22px;overflow-x:auto;padding-bottom:4px;}
+  .results-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;}
+  .results-head .count{font-size:13.5px;color:var(--ink-soft);}
+  .listing-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;}
+  .listing-card{background:#fff;border:1px solid var(--line);border-radius:var(--radius-lg);overflow:hidden;cursor:pointer;transition:box-shadow .15s ease, transform .15s ease;}
+  .listing-card:hover{box-shadow:var(--shadow-pop);transform:translateY(-2px);}
+  .listing-thumb{height:150px;position:relative;display:flex;align-items:center;justify-content:center;}
+  .listing-thumb svg{width:46px;height:46px;opacity:.9;}
+  .listing-thumb .fav{position:absolute;top:10px;right:10px;width:30px;height:30px;border-radius:50%;background:rgba(255,255,255,.92);display:flex;align-items:center;justify-content:center;color:var(--ink-soft);}
+  .listing-thumb .uni-badge{position:absolute;bottom:10px;left:10px;background:rgba(15,17,26,.55);backdrop-filter:blur(4px);color:#fff;font-size:11px;font-weight:700;padding:5px 10px;border-radius:999px;}
+  .listing-body{padding:16px 16px 18px;}
+  .listing-body .lt-title{font-family:var(--font-display);font-weight:700;font-size:15.5px;margin-bottom:4px;}
+  .listing-body .lt-loc{display:flex;align-items:center;gap:5px;font-size:12.5px;color:var(--ink-soft);margin-bottom:10px;}
+  .listing-amenities{display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap;}
+  .am-pill{display:flex;align-items:center;gap:4px;font-size:11px;font-weight:600;color:var(--ink-soft);background:var(--line-soft);padding:4px 9px;border-radius:999px;}
+  .listing-foot{display:flex;align-items:baseline;justify-content:space-between;padding-top:12px;border-top:1px solid var(--line-soft);}
+  .price-mono{font-family:var(--font-mono);font-weight:600;}
+  .listing-foot .price{font-size:17px;font-weight:700;}
+  .listing-foot .price small{font-size:11.5px;font-weight:500;color:var(--ink-faint);}
+  .listing-foot .rating{display:flex;align-items:center;gap:4px;font-size:12.5px;font-weight:700;}
+  .listing-foot .rating svg{width:14px;height:14px;color:var(--gold);fill:var(--gold);}
+
+  /* ---------------- DETAIL ---------------- */
+  .detail-grid{display:grid;grid-template-columns:1.6fr 1fr;gap:28px;align-items:flex-start;}
+  .gallery{display:grid;grid-template-columns:1.4fr 1fr;grid-template-rows:repeat(2,150px);gap:10px;border-radius:var(--radius-lg);overflow:hidden;margin-bottom:22px;}
+  .gallery > div{display:flex;align-items:center;justify-content:center;}
+  .gallery > div:first-child{grid-row:span 2;}
+  .gallery svg{width:34px;height:34px;opacity:.85;}
+  .back-link{display:inline-flex;align-items:center;gap:7px;font-size:13.5px;font-weight:700;color:var(--ink-soft);margin-bottom:18px;}
+  .back-link:hover{color:var(--ink);}
+  .detail-title-row{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px;gap:16px;}
+  .detail-title-row h1{font-size:25px;font-weight:800;}
+  .detail-loc{display:flex;align-items:center;gap:6px;color:var(--ink-soft);font-size:14px;margin-bottom:20px;}
+  .detail-section{padding:22px 0;border-top:1px solid var(--line-soft);}
+  .detail-section:first-of-type{border-top:none;}
+  .detail-section h3{font-size:15px;font-weight:800;margin-bottom:14px;}
+  .amenity-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px 20px;}
+  .amenity-item{display:flex;align-items:center;gap:10px;font-size:13.5px;color:var(--ink-soft);}
+  .amenity-item svg{color:var(--green);}
+  .owner-row{display:flex;align-items:center;gap:13px;}
+  .owner-row .av{width:46px;height:46px;border-radius:50%;background:linear-gradient(135deg,var(--blue),#6E97F4);display:flex;align-items:center;justify-content:center;color:#fff;font-family:var(--font-display);font-weight:800;}
+  .owner-meta .o-name{font-weight:700;font-size:14.5px;}
+  .owner-meta .o-sub{font-size:12.5px;color:var(--ink-faint);display:flex;align-items:center;gap:5px;margin-top:2px;}
+  .review-row{display:flex;gap:14px;padding:14px 0;border-bottom:1px solid var(--line-soft);}
+  .review-row:last-child{border-bottom:none;}
+  .review-row .av{width:38px;height:38px;border-radius:50%;background:var(--gold-wash);color:var(--gold);display:flex;align-items:center;justify-content:center;font-weight:800;font-family:var(--font-display);font-size:13px;flex-shrink:0;}
+  .review-name{font-weight:700;font-size:13.5px;}
+  .review-stars{display:flex;gap:2px;margin:3px 0 5px;}
+  .review-stars svg{width:13px;height:13px;color:var(--gold);fill:var(--gold);}
+  .review-text{font-size:13px;color:var(--ink-soft);line-height:1.55;}
+
+  .booking-card{position:sticky;top:90px;padding:24px;}
+  .booking-price{display:flex;align-items:baseline;gap:6px;margin-bottom:4px;}
+  .booking-price .amt{font-family:var(--font-mono);font-weight:600;font-size:26px;}
+  .booking-price .per{font-size:13px;color:var(--ink-faint);}
+  .booking-sub{font-size:12.5px;color:var(--ink-faint);margin-bottom:18px;}
+  .breakdown-row{display:flex;justify-content:space-between;font-size:13.5px;color:var(--ink-soft);padding:9px 0;}
+  .breakdown-row.total{border-top:1.5px dashed var(--line);margin-top:6px;padding-top:14px;font-weight:800;color:var(--ink);font-size:14.5px;}
+  .breakdown-row .v{font-family:var(--font-mono);font-weight:600;}
+
+  /* ---------------- DASHBOARD : ticket component (signature element) ---------------- */
+  .dash-grid{display:grid;grid-template-columns:1.5fr 1fr;gap:24px;align-items:flex-start;}
+  .ticket{background:#fff;border:1px solid var(--line);border-radius:var(--radius-lg);box-shadow:var(--shadow-card);overflow:hidden;}
+  .ticket-top{padding:26px 28px 22px;display:flex;justify-content:space-between;gap:20px;}
+  .ticket-top .tt-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--ink-faint);margin-bottom:8px;}
+  .ticket-top .tt-amount{font-family:var(--font-mono);font-weight:600;font-size:34px;color:var(--ink);}
+  .ticket-top .tt-amount sup{font-size:16px;}
+  .ticket-top .tt-due{font-size:12.5px;color:var(--ink-soft);margin-top:6px;}
+  .ticket-key{width:54px;height:54px;border-radius:14px;background:var(--gold-wash);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+  .ticket-key svg{width:26px;height:26px;color:var(--gold);}
+  .ticket-notch-row{position:relative;margin:0 0 0 0;}
+  .ticket-notch-row::before,.ticket-notch-row::after{content:'';position:absolute;top:50%;transform:translateY(-50%);width:26px;height:26px;border-radius:50%;background:var(--paper);}
+  .ticket-notch-row::before{left:-13px;}
+  .ticket-notch-row::after{right:-13px;}
+  .ticket-dash{border-top:2px dashed var(--line);}
+  .ticket-bottom{padding:22px 28px 26px;}
+  .ticket-line-item{display:flex;justify-content:space-between;font-size:13.5px;color:var(--ink-soft);padding:7px 0;}
+  .ticket-line-item .v{font-family:var(--font-mono);font-weight:600;color:var(--ink);}
+  .ticket-actions{display:flex;gap:10px;margin-top:18px;}
+
+  .quick-links{padding:6px;}
+  .ql-item{display:flex;align-items:center;gap:13px;padding:14px 16px;border-radius:13px;}
+  .ql-item:hover{background:var(--line-soft);}
+  .ql-icon{width:38px;height:38px;border-radius:11px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+  .ql-text .ql-title{font-weight:700;font-size:13.5px;}
+  .ql-text .ql-sub{font-size:12px;color:var(--ink-faint);}
+  .ql-item svg.chev{margin-left:auto;color:var(--ink-faint);width:16px;height:16px;}
+
+  .stay-card{padding:22px;margin-top:20px;}
+  .stay-card .stay-room{display:flex;gap:14px;align-items:center;margin-bottom:18px;}
+  .stay-thumb{width:64px;height:64px;border-radius:13px;background:linear-gradient(135deg,var(--blue),#6E97F4);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+  .stay-thumb svg{width:28px;height:28px;color:#fff;}
+  .stay-room .sr-title{font-weight:800;font-size:14.5px;}
+  .stay-room .sr-sub{font-size:12.5px;color:var(--ink-faint);margin-top:2px;}
+  .progress-track{height:8px;border-radius:99px;background:var(--line-soft);overflow:hidden;margin:8px 0 6px;}
+  .progress-fill{height:100%;background:linear-gradient(90deg,var(--red),var(--gold));border-radius:99px;}
+  .stay-meta{display:flex;justify-content:space-between;font-size:12px;color:var(--ink-faint);}
+
+  /* ---------------- PAYMENTS ---------------- */
+  .pay-grid{display:grid;grid-template-columns:1fr 1.1fr;gap:24px;align-items:flex-start;}
+  .method-list{display:flex;flex-direction:column;gap:10px;margin:18px 0 20px;}
+  .method-opt{display:flex;align-items:center;gap:12px;padding:14px 16px;border:1.5px solid var(--line);border-radius:13px;}
+  .method-opt.is-active{border-color:var(--red);background:var(--red-wash);}
+  .method-opt .radio{width:18px;height:18px;border-radius:50%;border:2px solid var(--ink-faint);flex-shrink:0;display:flex;align-items:center;justify-content:center;}
+  .method-opt.is-active .radio{border-color:var(--red);}
+  .method-opt.is-active .radio::after{content:'';width:9px;height:9px;border-radius:50%;background:var(--red);}
+  .method-opt .m-icon{width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;}
+  .method-opt .m-name{font-weight:700;font-size:13.5px;}
+  .method-opt .m-sub{font-size:11.5px;color:var(--ink-faint);}
+
+  table.tbl{width:100%;border-collapse:collapse;}
+  table.tbl th{text-align:left;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--ink-faint);padding:0 16px 12px;border-bottom:1px solid var(--line);}
+  table.tbl td{padding:14px 16px;font-size:13.5px;border-bottom:1px solid var(--line-soft);color:var(--ink-soft);}
+  table.tbl td.strong{color:var(--ink);font-weight:600;}
+  table.tbl tr:last-child td{border-bottom:none;}
+
+  /* ---------------- CONTRACT ---------------- */
+  .contract-card{padding:30px;max-width:760px;}
+  .contract-head{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:24px;padding-bottom:20px;border-bottom:1px solid var(--line-soft);}
+  .contract-id{font-family:var(--font-mono);font-size:12.5px;color:var(--ink-faint);margin-top:4px;}
+  .kv-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px 28px;margin-bottom:24px;}
+  .kv-item .kv-label{font-size:11.5px;color:var(--ink-faint);font-weight:700;text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px;}
+  .kv-item .kv-val{font-size:14.5px;font-weight:700;}
+  .clause{display:flex;gap:12px;padding:13px 0;border-top:1px solid var(--line-soft);font-size:13.5px;color:var(--ink-soft);line-height:1.55;}
+  .clause .num{font-family:var(--font-mono);font-weight:600;color:var(--red);flex-shrink:0;}
+
+  /* ---------------- PROFILE ---------------- */
+  .profile-grid{display:grid;grid-template-columns:280px 1fr;gap:24px;align-items:flex-start;}
+  .profile-card{padding:28px 22px;text-align:center;}
+  .profile-avatar{width:84px;height:84px;border-radius:50%;background:linear-gradient(135deg,var(--gold),#D8B873);display:flex;align-items:center;justify-content:center;color:#fff;font-family:var(--font-display);font-weight:800;font-size:28px;margin:0 auto 14px;}
+  .profile-form{padding:26px 28px;}
+  .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px 18px;margin-bottom:8px;}
+
+  .sec-title{font-size:14px;font-weight:800;margin-bottom:14px;display:flex;align-items:center;gap:8px;}
+  .sec-title svg{color:var(--red);}
+
+  @media (max-width: 980px){
+    .nav-links{display:none;}
+    .stat-grid{grid-template-columns:1fr 1fr;}
+    .listing-grid{grid-template-columns:1fr 1fr;}
+    .detail-grid,.dash-grid,.pay-grid,.profile-grid{grid-template-columns:1fr;}
+    .search-bar{flex-direction:column;}
+    .search-bar .seg{border-right:none;border-bottom:1px solid var(--line-soft);}
+  }
+  @media (max-width: 620px){
+    .listing-grid{grid-template-columns:1fr;}
+    .stat-grid{grid-template-columns:1fr 1fr;}
+    .page{padding:22px 16px 48px;}
+    .form-grid,.kv-grid,.amenity-grid{grid-template-columns:1fr;}
+  }
+</style>
+</head>
+<body>
+
+<!-- ============================================================
+     LOGIN
+============================================================= -->
+<div class="view auth-view active" id="view-login">
+  <div class="auth-mark">
+    <div class="logo-box">
+      <svg class="ic" viewBox="0 0 24 24"><path d="M3 11.5L12 4l9 7.5"/><path d="M5 10v9a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-9"/></svg>
+    </div>
+    <div class="wordmark">APP-<span>ROOMS</span></div>
+  </div>
+
+  <svg class="auth-key-illustration" width="220" height="220" viewBox="0 0 220 220" fill="none">
+    <circle cx="80" cy="80" r="34" stroke="#B68A3C" stroke-width="1.6" opacity=".55"/>
+    <path d="M80 114 L80 200" stroke="#B68A3C" stroke-width="1.6" opacity=".55"/>
+    <path d="M80 150 L100 150 M80 172 L96 172" stroke="#B68A3C" stroke-width="1.6" opacity=".55"/>
+    <circle cx="80" cy="80" r="13" stroke="#DC2626" stroke-width="1.6" opacity=".6"/>
+  </svg>
+
+  <div class="auth-card">
+    <div class="wordmark">APP-<span>ROOMS</span></div>
+    <div class="auth-eyebrow">Portal del inquilino</div>
+    <h1>Inicia sesión</h1>
+    <div class="auth-sub">Encuentra tu cuarto ideal cerca de tu universidad.</div>
+
+    <div class="field">
+      <label>Correo del estudiante <span class="req">*</span></label>
+      <input type="email" value="camila.rios@pucp.edu.pe" placeholder="tucorreo@universidad.edu">
+    </div>
+    <div class="field field-pw">
+      <label>Contraseña <span class="req">*</span></label>
+      <input type="password" value="••••••••">
+      <svg class="ic" viewBox="0 0 24 24"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+    </div>
+    <div class="terms">Al iniciar sesión aceptas los <a href="#">Términos de uso de APP-ROOMS</a></div>
+    <button class="btn btn-primary btn-block" onclick="enterApp()">Iniciar sesión</button>
+    <div class="auth-footer">
+      <a onclick="showView('view-register')">Crear cuenta</a> · <a href="#">Olvidé mi contraseña</a>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     REGISTER
+============================================================= -->
+<div class="view auth-view" id="view-register">
+  <div class="auth-mark">
+    <div class="logo-box"><svg class="ic" viewBox="0 0 24 24"><path d="M3 11.5L12 4l9 7.5"/><path d="M5 10v9a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-9"/></svg></div>
+    <div class="wordmark">APP-<span>ROOMS</span></div>
+  </div>
+
+  <div class="auth-card" style="max-width:460px;">
+    <div class="auth-eyebrow">Crear cuenta</div>
+    <h1 id="reg-title">Cuéntanos sobre ti</h1>
+    <div class="auth-sub" id="reg-sub">Solo te tomará un par de minutos.</div>
+
+    <div class="steps-row">
+      <div class="step-dot is-active" id="dot-1">1</div>
+      <div class="step-line" id="line-1"></div>
+      <div class="step-dot" id="dot-2">2</div>
+    </div>
+
+    <!-- step 1 -->
+    <div id="reg-step-1">
+      <div class="field"><label>Nombre completo <span class="req">*</span></label><input placeholder="Camila Ríos"></div>
+      <div class="field"><label>Correo universitario <span class="req">*</span></label><input placeholder="nombre@universidad.edu"></div>
+      <div class="field"><label>Universidad <span class="req">*</span></label>
+        <select>
+          <option>Pontificia Universidad Católica del Perú</option>
+          <option>Universidad de Lima</option>
+          <option>UPC</option>
+          <option>Universidad del Pacífico</option>
+        </select>
+      </div>
+      <div class="field field-pw"><label>Crea una contraseña <span class="req">*</span></label><input type="password" placeholder="Mínimo 8 caracteres"></div>
+      <button class="btn btn-primary btn-block" onclick="regStep(2)">Continuar</button>
+    </div>
+
+    <!-- step 2 -->
+    <div id="reg-step-2" style="display:none;">
+      <div class="verify-note">
+        <svg class="ic" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z"/></svg>
+        Verificamos tu identidad con <strong>Truora</strong> y validamos tus datos con <strong>Metamap</strong> para mantener segura a la comunidad APP-ROOMS.
+      </div>
+      <div class="upload-box">
+        <svg class="ic" viewBox="0 0 24 24" style="width:28px;height:28px;margin:0 auto;display:block;"><path d="M12 16V4M7 9l5-5 5 5"/><path d="M5 20h14"/></svg>
+        <div class="ub-title">Sube tu documento de identidad</div>
+        <div class="ub-sub">DNI o carné universitario · JPG, PNG o PDF</div>
+      </div>
+      <button class="btn btn-primary btn-block" onclick="enterApp()">Finalizar registro</button>
+      <button class="btn btn-ghost btn-block" style="margin-top:10px;" onclick="regStep(1)">Atrás</button>
+    </div>
+
+    <div class="auth-footer"><a onclick="showView('view-login')">Ya tengo una cuenta — Iniciar sesión</a></div>
+  </div>
+</div>
+
+<!-- ============================================================
+     APP SHELL
+============================================================= -->
+<div class="app-shell" id="app-shell">
+
+  <div class="topbar">
+    <div class="wordmark"><div class="logo-box"><svg class="ic" viewBox="0 0 24 24"><path d="M3 11.5L12 4l9 7.5"/><path d="M5 10v9a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-9"/></svg></div>APP-<span>ROOMS</span></div>
+    <div class="nav-links">
+      <button class="nav-link" data-view="view-explore" onclick="showApp('view-explore', this)">
+        <svg class="ic" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg> Explorar
+      </button>
+      <button class="nav-link" data-view="view-dashboard" onclick="showApp('view-dashboard', this)">
+        <svg class="ic" viewBox="0 0 24 24"><path d="M3 11.5L12 4l9 7.5"/><path d="M5 10v9a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-9"/></svg> Mi alojamiento
+      </button>
+      <button class="nav-link" data-view="view-payments" onclick="showApp('view-payments', this)">
+        <svg class="ic" viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2.5"/><path d="M2 10h20"/></svg> Pagos
+      </button>
+      <button class="nav-link" data-view="view-contract" onclick="showApp('view-contract', this)">
+        <svg class="ic" viewBox="0 0 24 24"><path d="M7 3h7l5 5v13a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1Z"/><path d="M14 3v5h5M9 13h6M9 17h6"/></svg> Contrato
+      </button>
+    </div>
+    <div class="topbar-actions">
+      <div class="icon-btn"><svg class="ic" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg></div>
+      <div class="icon-btn"><svg class="ic" viewBox="0 0 24 24"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg><span class="dot"></span></div>
+      <div class="avatar-chip" onclick="showApp('view-profile', null)">
+        <div class="avatar-circle">CR</div>
+        <span class="av-name">Camila</span>
+        <svg class="ic" viewBox="0 0 24 24" style="width:13px;height:13px;"><path d="m6 9 6 6 6-6"/></svg>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== EXPLORE ===================== -->
+  <section class="view app-view" id="view-explore">
+    <div class="page">
+
+      <div class="hero-search">
+        <h1>Tu próximo cuarto, a un clic de tu universidad</h1>
+        <div class="sub">Más de 1,200 alojamientos verificados cerca de PUCP, Universidad de Lima, UPC y Universidad del Pacífico.</div>
+        <div class="search-bar">
+          <div class="seg">
+            <label>Universidad</label>
+            <select><option>PUCP — San Miguel</option><option>Universidad de Lima</option><option>UPC — Monterrico</option></select>
+          </div>
+          <div class="seg">
+            <label>Tipo de cuarto</label>
+            <select><option>Cualquiera</option><option>Privado</option><option>Compartido</option><option>Studio</option></select>
+          </div>
+          <div class="seg">
+            <label>Presupuesto máx.</label>
+            <input placeholder="S/ 900">
+          </div>
+          <button class="btn btn-primary"><svg class="ic" viewBox="0 0 24 24" style="stroke:#fff;"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg> Buscar</button>
+        </div>
+      </div>
+
+      <div class="filter-row">
+        <div class="chip is-active">Todos</div>
+        <div class="chip">Cerca de mi universidad</div>
+        <div class="chip">Amoblado</div>
+        <div class="chip">Incluye servicios</div>
+        <div class="chip">Admite mascotas</div>
+        <div class="chip">Verificado</div>
+      </div>
+
+      <div class="results-head">
+        <h2 style="font-size:16px;font-weight:800;">Alojamientos disponibles</h2>
+        <div class="count">4 resultados cerca de PUCP</div>
+      </div>
+
+      <div class="listing-grid">
+
+        <div class="listing-card" onclick="openDetail()">
+          <div class="listing-thumb" style="background:linear-gradient(135deg,var(--blue),#7BA0F6);">
+            <svg viewBox="0 0 24 24" stroke="#fff" fill="none" stroke-width="1.6"><path d="M3 11.5L12 4l9 7.5"/><path d="M5 10v9a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-9"/></svg>
+            <div class="fav"><svg class="ic" viewBox="0 0 24 24" style="width:14px;height:14px;"><path d="M20.8 8.6c0 4.4-8.8 10.4-8.8 10.4S3.2 13 3.2 8.6a4.8 4.8 0 0 1 8.8-2.7 4.8 4.8 0 0 1 8.8 2.7Z"/></svg></div>
+            <div class="uni-badge">8 min a PUCP</div>
+          </div>
+          <div class="listing-body">
+            <div class="lt-title">Habitación privada · Pueblo Libre</div>
+            <div class="lt-loc"><svg class="ic" viewBox="0 0 24 24" style="width:13px;height:13px;"><path d="M12 22s8-4.5 8-11a8 8 0 1 0-16 0c0 6.5 8 11 8 11Z"/><circle cx="12" cy="11" r="3"/></svg> Jr. Cantuarias 240</div>
+            <div class="listing-amenities">
+              <span class="am-pill">Wifi</span><span class="am-pill">Amoblado</span><span class="am-pill">Lavandería</span>
+            </div>
+            <div class="listing-foot">
+              <div class="price price-mono">S/ 850 <small>/ mes</small></div>
+              <div class="rating"><svg viewBox="0 0 24 24"><path d="M12 2l3 6.6 7.2.9-5.3 5 1.4 7.1L12 18l-6.3 3.6L7.1 14.5 1.8 9.5l7.2-.9L12 2Z"/></svg>4.8</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="listing-card" onclick="openDetail()">
+          <div class="listing-thumb" style="background:linear-gradient(135deg,var(--green),#5FCB89);">
+            <svg viewBox="0 0 24 24" stroke="#fff" fill="none" stroke-width="1.6"><rect x="4" y="9" width="16" height="11" rx="1.5"/><path d="M8 9V6a4 4 0 0 1 8 0v3"/></svg>
+            <div class="fav"><svg class="ic" viewBox="0 0 24 24" style="width:14px;height:14px;"><path d="M20.8 8.6c0 4.4-8.8 10.4-8.8 10.4S3.2 13 3.2 8.6a4.8 4.8 0 0 1 8.8-2.7 4.8 4.8 0 0 1 8.8 2.7Z"/></svg></div>
+            <div class="uni-badge">12 min a PUCP</div>
+          </div>
+          <div class="listing-body">
+            <div class="lt-title">Cuarto compartido · San Miguel</div>
+            <div class="lt-loc"><svg class="ic" viewBox="0 0 24 24" style="width:13px;height:13px;"><path d="M12 22s8-4.5 8-11a8 8 0 1 0-16 0c0 6.5 8 11 8 11Z"/><circle cx="12" cy="11" r="3"/></svg> Av. La Mar 1180</div>
+            <div class="listing-amenities">
+              <span class="am-pill">Wifi</span><span class="am-pill">Servicios incl.</span>
+            </div>
+            <div class="listing-foot">
+              <div class="price price-mono">S/ 600 <small>/ mes</small></div>
+              <div class="rating"><svg viewBox="0 0 24 24"><path d="M12 2l3 6.6 7.2.9-5.3 5 1.4 7.1L12 18l-6.3 3.6L7.1 14.5 1.8 9.5l7.2-.9L12 2Z"/></svg>4.6</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="listing-card" onclick="openDetail()">
+          <div class="listing-thumb" style="background:linear-gradient(135deg,var(--teal),#4FCBDA);">
+            <svg viewBox="0 0 24 24" stroke="#fff" fill="none" stroke-width="1.6"><rect x="3" y="6" width="18" height="14" rx="2"/><path d="M3 10h18"/></svg>
+            <div class="fav"><svg class="ic" viewBox="0 0 24 24" style="width:14px;height:14px;"><path d="M20.8 8.6c0 4.4-8.8 10.4-8.8 10.4S3.2 13 3.2 8.6a4.8 4.8 0 0 1 8.8-2.7 4.8 4.8 0 0 1 8.8 2.7Z"/></svg></div>
+            <div class="uni-badge">15 min a U. de Lima</div>
+          </div>
+          <div class="listing-body">
+            <div class="lt-title">Studio independiente · Surco</div>
+            <div class="lt-loc"><svg class="ic" viewBox="0 0 24 24" style="width:13px;height:13px;"><path d="M12 22s8-4.5 8-11a8 8 0 1 0-16 0c0 6.5 8 11 8 11Z"/><circle cx="12" cy="11" r="3"/></svg> Av. Primavera 980</div>
+            <div class="listing-amenities">
+              <span class="am-pill">Wifi</span><span class="am-pill">Cocina propia</span><span class="am-pill">Amoblado</span>
+            </div>
+            <div class="listing-foot">
+              <div class="price price-mono">S/ 1,100 <small>/ mes</small></div>
+              <div class="rating"><svg viewBox="0 0 24 24"><path d="M12 2l3 6.6 7.2.9-5.3 5 1.4 7.1L12 18l-6.3 3.6L7.1 14.5 1.8 9.5l7.2-.9L12 2Z"/></svg>4.9</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="listing-card" onclick="openDetail()">
+          <div class="listing-thumb" style="background:linear-gradient(135deg,var(--amber),#F0AE5C);">
+            <svg viewBox="0 0 24 24" stroke="#fff" fill="none" stroke-width="1.6"><path d="M3 11.5L12 4l9 7.5"/><path d="M5 10v9a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-9"/></svg>
+            <div class="fav"><svg class="ic" viewBox="0 0 24 24" style="width:14px;height:14px;"><path d="M20.8 8.6c0 4.4-8.8 10.4-8.8 10.4S3.2 13 3.2 8.6a4.8 4.8 0 0 1 8.8-2.7 4.8 4.8 0 0 1 8.8 2.7Z"/></svg></div>
+            <div class="uni-badge">10 min a U. del Pacífico</div>
+          </div>
+          <div class="listing-body">
+            <div class="lt-title">Habitación privada · Jesús María</div>
+            <div class="lt-loc"><svg class="ic" viewBox="0 0 24 24" style="width:13px;height:13px;"><path d="M12 22s8-4.5 8-11a8 8 0 1 0-16 0c0 6.5 8 11 8 11Z"/><circle cx="12" cy="11" r="3"/></svg> Jr. Risso 540</div>
+            <div class="listing-amenities">
+              <span class="am-pill">Wifi</span><span class="am-pill">Lavandería</span>
+            </div>
+            <div class="listing-foot">
+              <div class="price price-mono">S/ 950 <small>/ mes</small></div>
+              <div class="rating"><svg viewBox="0 0 24 24"><path d="M12 2l3 6.6 7.2.9-5.3 5 1.4 7.1L12 18l-6.3 3.6L7.1 14.5 1.8 9.5l7.2-.9L12 2Z"/></svg>4.5</div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== DETAIL ===================== -->
+  <section class="view app-view" id="view-detail">
+    <div class="page">
+      <a class="back-link" onclick="showApp('view-explore', null)"><svg class="ic" viewBox="0 0 24 24" style="width:15px;height:15px;"><path d="m15 18-6-6 6-6"/></svg> Volver a explorar</a>
+
+      <div class="gallery">
+        <div style="background:linear-gradient(135deg,var(--blue),#7BA0F6);"><svg viewBox="0 0 24 24" stroke="#fff" fill="none" stroke-width="1.5"><path d="M3 11.5L12 4l9 7.5"/><path d="M5 10v9a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-9"/></svg></div>
+        <div style="background:linear-gradient(135deg,#3B4668,#525E89);"><svg viewBox="0 0 24 24" stroke="#fff" fill="none" stroke-width="1.5"><rect x="3" y="6" width="18" height="13" rx="2"/><path d="M7 6V4h10v2"/></svg></div>
+        <div style="background:linear-gradient(135deg,var(--gold),#D8B873);"><svg viewBox="0 0 24 24" stroke="#fff" fill="none" stroke-width="1.5"><circle cx="12" cy="9" r="3"/><path d="M5 20c1.5-4 4.5-6 7-6s5.5 2 7 6"/></svg></div>
+      </div>
+
+      <div class="detail-grid">
+        <div>
+          <div class="detail-title-row">
+            <div>
+              <h1>Habitación privada · Pueblo Libre</h1>
+            </div>
+            <span class="badge badge-green"><svg class="ic" viewBox="0 0 24 24" style="width:12px;height:12px;"><path d="M20 6 9 17l-5-5"/></svg> Verificado</span>
+          </div>
+          <div class="detail-loc"><svg class="ic" viewBox="0 0 24 24" style="width:15px;height:15px;"><path d="M12 22s8-4.5 8-11a8 8 0 1 0-16 0c0 6.5 8 11 8 11Z"/><circle cx="12" cy="11" r="3"/></svg> Jr. Cantuarias 240, Pueblo Libre · 8 min caminando a PUCP</div>
+
+          <div class="detail-section">
+            <h3>Sobre este alojamiento</h3>
+            <p style="font-size:13.5px;color:var(--ink-soft);line-height:1.7;">Habitación privada y amoblada dentro de una vivienda compartida con 2 estudiantes más. Cocina, sala y lavandería de uso común. Ambiente tranquilo, ideal para estudiar, a pocas cuadras del campus de PUCP.</p>
+          </div>
+
+          <div class="detail-section">
+            <h3>Lo que incluye</h3>
+            <div class="amenity-grid">
+              <div class="amenity-item"><svg class="ic" viewBox="0 0 24 24" style="width:16px;height:16px;"><path d="M20 6 9 17l-5-5"/></svg> Wifi de alta velocidad</div>
+              <div class="amenity-item"><svg class="ic" viewBox="0 0 24 24" style="width:16px;height:16px;"><path d="M20 6 9 17l-5-5"/></svg> Cuarto amoblado</div>
+              <div class="amenity-item"><svg class="ic" viewBox="0 0 24 24" style="width:16px;height:16px;"><path d="M20 6 9 17l-5-5"/></svg> Lavandería compartida</div>
+              <div class="amenity-item"><svg class="ic" viewBox="0 0 24 24" style="width:16px;height:16px;"><path d="M20 6 9 17l-5-5"/></svg> Agua y luz incluidos</div>
+              <div class="amenity-item"><svg class="ic" viewBox="0 0 24 24" style="width:16px;height:16px;"><path d="M20 6 9 17l-5-5"/></svg> Cocina equipada</div>
+              <div class="amenity-item"><svg class="ic" viewBox="0 0 24 24" style="width:16px;height:16px;"><path d="M20 6 9 17l-5-5"/></svg> Zona de estudio</div>
+            </div>
+          </div>
+
+          <div class="detail-section">
+            <h3>Publicado por</h3>
+            <div class="owner-row">
+              <div class="av">MG</div>
+              <div class="owner-meta">
+                <div class="o-name">María Gutiérrez</div>
+                <div class="o-sub"><svg class="ic" viewBox="0 0 24 24" style="width:12px;height:12px;"><path d="M20 6 9 17l-5-5"/></svg> Propietaria verificada · responde en menos de 2 horas</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="detail-section">
+            <h3>Reseñas de inquilinos · 4.8 (26)</h3>
+            <div class="review-row">
+              <div class="av">JL</div>
+              <div>
+                <div class="review-name">Jorge L. — UPC</div>
+                <div class="review-stars"><svg viewBox="0 0 24 24"><path d="M12 2l3 6.6 7.2.9-5.3 5 1.4 7.1L12 18l-6.3 3.6L7.1 14.5 1.8 9.5l7.2-.9L12 2Z"/></svg><svg viewBox="0 0 24 24"><path d="M12 2l3 6.6 7.2.9-5.3 5 1.4 7.1L12 18l-6.3 3.6L7.1 14.5 1.8 9.5l7.2-.9L12 2Z"/></svg><svg viewBox="0 0 24 24"><path d="M12 2l3 6.6 7.2.9-5.3 5 1.4 7.1L12 18l-6.3 3.6L7.1 14.5 1.8 9.5l7.2-.9L12 2Z"/></svg><svg viewBox="0 0 24 24"><path d="M12 2l3 6.6 7.2.9-5.3 5 1.4 7.1L12 18l-6.3 3.6L7.1 14.5 1.8 9.5l7.2-.9L12 2Z"/></svg><svg viewBox="0 0 24 24"><path d="M12 2l3 6.6 7.2.9-5.3 5 1.4 7.1L12 18l-6.3 3.6L7.1 14.5 1.8 9.5l7.2-.9L12 2Z"/></svg></div>
+                <div class="review-text">Muy buena ubicación, la propietaria es puntual con el mantenimiento y el ambiente es tranquilo para estudiar.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="booking-card card">
+          <div class="booking-price"><span class="amt">S/ 850</span><span class="per">/ mes</span></div>
+          <div class="booking-sub">Disponible desde el 15 de julio</div>
+          <div class="breakdown-row"><span>Alquiler mensual</span><span class="v">S/ 800</span></div>
+          <div class="breakdown-row"><span>Mantenimiento</span><span class="v">S/ 50</span></div>
+          <div class="breakdown-row"><span>Garantía (único pago)</span><span class="v">S/ 800</span></div>
+          <div class="breakdown-row total"><span>Total para reservar</span><span class="v">S/ 1,650</span></div>
+          <button class="btn btn-primary btn-block" style="margin-top:18px;">Solicitar este cuarto</button>
+          <button class="btn btn-ghost btn-block" style="margin-top:10px;">Contactar a la propietaria</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== DASHBOARD ===================== -->
+  <section class="view app-view" id="view-dashboard">
+    <div class="page">
+      <div class="page-head">
+        <div>
+          <div class="eyebrow">Centro del inquilino</div>
+          <h1>Bienvenida de nuevo, Camila</h1>
+          <div class="sub">Aquí tienes el resumen de tu alojamiento actual.</div>
+        </div>
+      </div>
+
+      <div class="stat-grid">
+        <div class="stat-card">
+          <div class="stat-icon" style="background:var(--red-wash);"><svg class="ic" viewBox="0 0 24 24" style="color:var(--red);"><rect x="2" y="5" width="20" height="14" rx="2.5"/><path d="M2 10h20"/></svg></div>
+          <div class="stat-label">Próximo pago</div>
+          <div class="stat-value">S/ 850</div>
+          <div class="stat-foot">Vence el 15 de julio</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon" style="background:var(--blue-wash);"><svg class="ic" viewBox="0 0 24 24" style="color:var(--blue);"><rect x="3" y="4" width="18" height="18" rx="2.5"/><path d="M8 2v4M16 2v4M3 10h18"/></svg></div>
+          <div class="stat-label">Viviendo aquí</div>
+          <div class="stat-value">47 días</div>
+          <div class="stat-foot">Desde el 13 de mayo</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon" style="background:var(--green-wash);"><svg class="ic" viewBox="0 0 24 24" style="color:var(--green);"><path d="M7 3h7l5 5v13a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1Z"/><path d="M14 3v5h5"/></svg></div>
+          <div class="stat-label">Estado del contrato</div>
+          <div class="stat-value" style="font-size:17px;">Vigente</div>
+          <div class="stat-foot">Renueva el 30 de noviembre</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon" style="background:var(--gold-wash);"><svg class="ic" viewBox="0 0 24 24" style="color:var(--gold);"><path d="M12 2l3 6.6 7.2.9-5.3 5 1.4 7.1L12 18l-6.3 3.6L7.1 14.5 1.8 9.5l7.2-.9L12 2Z"/></svg></div>
+          <div class="stat-label">Tu calificación</div>
+          <div class="stat-value">4.8 / 5</div>
+          <div class="stat-foot">Como inquilina</div>
+        </div>
+      </div>
+
+      <div class="dash-grid">
+        <div>
+          <div class="sec-title"><svg class="ic" viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2.5"/><path d="M2 10h20"/></svg> Ciclo de pago actual</div>
+          <div class="ticket">
+            <div class="ticket-top">
+              <div>
+                <div class="tt-label">Total a pagar · julio 2026</div>
+                <div class="tt-amount"><sup>S/</sup> 850</div>
+                <div class="tt-due">Vence el 15 de julio · 9 días restantes</div>
+              </div>
+              <div class="ticket-key"><svg viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="1.6"><circle cx="9" cy="9" r="4.5"/><path d="M12.2 11.8 20 19.5M16.5 16l2.5 2.5M19 13.5l2.5 2.5"/></svg></div>
+            </div>
+            <div class="ticket-notch-row"><div class="ticket-dash"></div></div>
+            <div class="ticket-bottom">
+              <div class="ticket-line-item"><span>Alquiler mensual</span><span class="v">S/ 800</span></div>
+              <div class="ticket-line-item"><span>Mantenimiento</span><span class="v">S/ 50</span></div>
+              <div class="ticket-line-item" style="border-top:1px solid var(--line-soft);margin-top:4px;padding-top:11px;font-weight:800;"><span>Total</span><span class="v">S/ 850</span></div>
+              <div class="ticket-actions">
+                <button class="btn btn-primary" onclick="showApp('view-payments', null)">Pagar ahora</button>
+                <button class="btn btn-ghost" onclick="showApp('view-payments', null)">Ver historial</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="stay-card card">
+            <div class="stay-room">
+              <div class="stay-thumb"><svg viewBox="0 0 24 24" stroke="#fff" fill="none" stroke-width="1.6"><path d="M3 11.5L12 4l9 7.5"/><path d="M5 10v9a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-9"/></svg></div>
+              <div>
+                <div class="sr-title">Habitación privada · Pueblo Libre</div>
+                <div class="sr-sub">Propietaria: María Gutiérrez</div>
+              </div>
+            </div>
+            <div class="progress-track"><div class="progress-fill" style="width:62%;"></div></div>
+            <div class="stay-meta"><span>13 may 2026</span><span>Contrato 12 meses</span><span>30 nov 2026</span></div>
+          </div>
+        </div>
+
+        <div>
+          <div class="sec-title"><svg class="ic" viewBox="0 0 24 24"><path d="M13 2 3 14h7l-1 8 10-12h-7l1-8Z"/></svg> Accesos rápidos</div>
+          <div class="card quick-links">
+            <div class="ql-item" onclick="showApp('view-contract', null)">
+              <div class="ql-icon" style="background:var(--blue-wash);"><svg class="ic" viewBox="0 0 24 24" style="color:var(--blue);"><path d="M7 3h7l5 5v13a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1Z"/></svg></div>
+              <div class="ql-text"><div class="ql-title">Ver mi contrato</div><div class="ql-sub">Vigente hasta nov. 2026</div></div>
+              <svg class="ic chev" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg>
+            </div>
+            <div class="ql-item">
+              <div class="ql-icon" style="background:var(--amber-wash);"><svg class="ic" viewBox="0 0 24 24" style="color:var(--amber);"><path d="M10.3 3.9 2.6 17a1.6 1.6 0 0 0 1.4 2.4h16a1.6 1.6 0 0 0 1.4-2.4L13.7 3.9a1.6 1.6 0 0 0-2.8 0Z"/><path d="M12 9v4M12 16h.01"/></svg></div>
+              <div class="ql-text"><div class="ql-title">Reportar una incidencia</div><div class="ql-sub">Mantenimiento o reclamo</div></div>
+              <svg class="ic chev" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg>
+            </div>
+            <div class="ql-item">
+              <div class="ql-icon" style="background:var(--green-wash);"><svg class="ic" viewBox="0 0 24 24" style="color:var(--green);"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/></svg></div>
+              <div class="ql-text"><div class="ql-title">Contactar a la propietaria</div><div class="ql-sub">Responde en ~2 horas</div></div>
+              <svg class="ic chev" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg>
+            </div>
+            <div class="ql-item" onclick="showApp('view-explore', null)">
+              <div class="ql-icon" style="background:var(--red-wash);"><svg class="ic" viewBox="0 0 24 24" style="color:var(--red);"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg></div>
+              <div class="ql-text"><div class="ql-title">Explorar otros alojamientos</div><div class="ql-sub">Para tu próximo semestre</div></div>
+              <svg class="ic chev" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== PAYMENTS ===================== -->
+  <section class="view app-view" id="view-payments">
+    <div class="page">
+      <div class="page-head">
+        <div>
+          <div class="eyebrow">Pagos</div>
+          <h1>Tus pagos</h1>
+          <div class="sub">Revisa tu próximo pago, métodos disponibles e historial.</div>
+        </div>
+      </div>
+
+      <div class="pay-grid">
+        <div>
+          <div class="ticket">
+            <div class="ticket-top">
+              <div>
+                <div class="tt-label">Pago de julio</div>
+                <div class="tt-amount"><sup>S/</sup> 850</div>
+                <div class="tt-due">Vence el 15 de julio · 9 días restantes</div>
+              </div>
+              <div class="ticket-key"><svg viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="1.6"><circle cx="9" cy="9" r="4.5"/><path d="M12.2 11.8 20 19.5M16.5 16l2.5 2.5M19 13.5l2.5 2.5"/></svg></div>
+            </div>
+            <div class="ticket-notch-row"><div class="ticket-dash"></div></div>
+            <div class="ticket-bottom">
+              <div class="sec-title" style="margin-top:4px;">Elige un método de pago</div>
+              <div class="method-list">
+                <div class="method-opt is-active">
+                  <div class="radio"></div>
+                  <div class="m-icon" style="background:var(--blue-wash);"><svg class="ic" viewBox="0 0 24 24" style="width:16px;height:16px;color:var(--blue);"><rect x="2" y="5" width="20" height="14" rx="2.5"/><path d="M2 10h20"/></svg></div>
+                  <div><div class="m-name">Tarjeta de crédito o débito</div><div class="m-sub">Procesado vía Culqi</div></div>
+                </div>
+                <div class="method-opt">
+                  <div class="radio"></div>
+                  <div class="m-icon" style="background:var(--green-wash);"><svg class="ic" viewBox="0 0 24 24" style="width:16px;height:16px;color:var(--green);"><rect x="5" y="2" width="14" height="20" rx="2.5"/><path d="M9 18h6"/></svg></div>
+                  <div><div class="m-name">Yape / Plin</div><div class="m-sub">Procesado vía MercadoPago</div></div>
+                </div>
+                <div class="method-opt">
+                  <div class="radio"></div>
+                  <div class="m-icon" style="background:var(--gold-wash);"><svg class="ic" viewBox="0 0 24 24" style="width:16px;height:16px;color:var(--gold);"><rect x="3" y="6" width="18" height="13" rx="2"/><path d="M3 10h18"/></svg></div>
+                  <div><div class="m-name">Transferencia bancaria</div><div class="m-sub">Confirmación manual, 24h</div></div>
+                </div>
+              </div>
+              <button class="btn btn-primary btn-block">Pagar S/ 850 ahora</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="card" style="padding:8px 0 16px;">
+          <div style="padding:18px 20px 6px;font-weight:800;font-size:14.5px;">Historial de pagos</div>
+          <table class="tbl">
+            <thead><tr><th>Fecha</th><th>Concepto</th><th>Monto</th><th>Estado</th></tr></thead>
+            <tbody>
+              <tr><td>15 jun 2026</td><td class="strong">Alquiler · junio</td><td class="mono">S/ 850</td><td><span class="badge badge-green">Pagado</span></td></tr>
+              <tr><td>15 may 2026</td><td class="strong">Alquiler · mayo</td><td class="mono">S/ 850</td><td><span class="badge badge-green">Pagado</span></td></tr>
+              <tr><td>13 may 2026</td><td class="strong">Garantía</td><td class="mono">S/ 800</td><td><span class="badge badge-green">Pagado</span></td></tr>
+              <tr><td>15 jul 2026</td><td class="strong">Alquiler · julio</td><td class="mono">S/ 850</td><td><span class="badge badge-amber">Pendiente</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== CONTRACT ===================== -->
+  <section class="view app-view" id="view-contract">
+    <div class="page">
+      <div class="page-head">
+        <div>
+          <div class="eyebrow">Contrato</div>
+          <h1>Tu contrato de alquiler</h1>
+        </div>
+      </div>
+
+      <div class="contract-card card">
+        <div class="contract-head">
+          <div>
+            <h2 style="font-size:18px;font-weight:800;">Habitación privada · Pueblo Libre</h2>
+            <div class="contract-id">N.° de contrato CT-2026-00847</div>
+          </div>
+          <span class="badge badge-green"><svg class="ic" viewBox="0 0 24 24" style="width:12px;height:12px;"><path d="M20 6 9 17l-5-5"/></svg> Vigente</span>
+        </div>
+
+        <div class="kv-grid">
+          <div class="kv-item"><div class="kv-label">Inquilina</div><div class="kv-val">Camila Ríos</div></div>
+          <div class="kv-item"><div class="kv-label">Propietaria</div><div class="kv-val">María Gutiérrez</div></div>
+          <div class="kv-item"><div class="kv-label">Inicio de contrato</div><div class="kv-val">13 may 2026</div></div>
+          <div class="kv-item"><div class="kv-label">Fin de contrato</div><div class="kv-val">30 nov 2026</div></div>
+          <div class="kv-item"><div class="kv-label">Monto mensual</div><div class="kv-val mono">S/ 850</div></div>
+          <div class="kv-item"><div class="kv-label">Garantía</div><div class="kv-val mono">S/ 800</div></div>
+        </div>
+
+        <div class="sec-title">Cláusulas principales</div>
+        <div class="clause"><span class="num">01</span> El pago mensual debe realizarse dentro de los primeros 5 días de cada mes a través de la plataforma APP-ROOMS.</div>
+        <div class="clause"><span class="num">02</span> La garantía se reembolsa dentro de los 15 días posteriores a la finalización del contrato, sujeta a inspección del cuarto.</div>
+        <div class="clause"><span class="num">03</span> Cualquier incidencia de mantenimiento debe reportarse desde la sección "Mi alojamiento" dentro de las 48 horas de ocurrida.</div>
+        <div class="clause"><span class="num">04</span> La renovación del contrato debe confirmarse con un mínimo de 30 días de anticipación a la fecha de término.</div>
+
+        <button class="btn btn-dark" style="margin-top:22px;"><svg class="ic" viewBox="0 0 24 24" style="stroke:#fff;width:16px;height:16px;"><path d="M12 16V4M7 11l5 5 5-5"/><path d="M5 20h14"/></svg> Descargar contrato (PDF)</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== PROFILE ===================== -->
+  <section class="view app-view" id="view-profile">
+    <div class="page">
+      <div class="page-head">
+        <div>
+          <div class="eyebrow">Cuenta</div>
+          <h1>Mi perfil</h1>
+        </div>
+      </div>
+
+      <div class="profile-grid">
+        <div class="profile-card card">
+          <div class="profile-avatar">CR</div>
+          <h3 style="font-size:16px;">Camila Ríos</h3>
+          <div style="font-size:12.5px;color:var(--ink-faint);margin:3px 0 14px;">PUCP · Ingeniería Industrial</div>
+          <span class="badge badge-green"><svg class="ic" viewBox="0 0 24 24" style="width:12px;height:12px;"><path d="M20 6 9 17l-5-5"/></svg> Identidad verificada</span>
+          <div style="margin-top:18px;display:flex;flex-direction:column;gap:8px;">
+            <button class="btn btn-ghost btn-block btn-sm" onclick="showView('view-login')">Cerrar sesión</button>
+          </div>
+        </div>
+
+        <div class="profile-form card">
+          <div class="sec-title"><svg class="ic" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg> Información personal</div>
+          <div class="form-grid">
+            <div class="field"><label>Nombre completo</label><input value="Camila Ríos"></div>
+            <div class="field"><label>Correo universitario</label><input value="camila.rios@pucp.edu.pe"></div>
+            <div class="field"><label>Teléfono</label><input value="+51 987 654 321"></div>
+            <div class="field"><label>Universidad</label><input value="PUCP — San Miguel"></div>
+            <div class="field"><label>Carrera</label><input value="Ingeniería Industrial"></div>
+            <div class="field"><label>Ciclo académico</label><input value="7.° ciclo"></div>
+          </div>
+          <button class="btn btn-primary">Guardar cambios</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<script>
+  function showView(id){
+    document.querySelectorAll('.auth-view').forEach(v=>v.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+  }
+  function regStep(n){
+    document.getElementById('reg-step-1').style.display = n===1 ? 'block':'none';
+    document.getElementById('reg-step-2').style.display = n===2 ? 'block':'none';
+    document.getElementById('dot-1').classList.toggle('is-done', n===2);
+    document.getElementById('dot-1').classList.toggle('is-active', n===1);
+    document.getElementById('line-1').classList.toggle('is-done', n===2);
+    document.getElementById('dot-2').classList.toggle('is-active', n===2);
+    document.getElementById('reg-title').textContent = n===2 ? 'Verifica tu identidad' : 'Cuéntanos sobre ti';
+    document.getElementById('reg-sub').textContent = n===2 ? 'Último paso antes de empezar a buscar.' : 'Solo te tomará un par de minutos.';
+  }
+  function enterApp(){
+    document.querySelectorAll('.auth-view').forEach(v=>v.classList.remove('active'));
+    document.getElementById('app-shell').classList.add('active');
+    showApp('view-explore', document.querySelector('.nav-link[data-view="view-explore"]'));
+  }
+  function showApp(id, btn){
+    document.querySelectorAll('.app-view').forEach(v=>v.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    document.querySelectorAll('.nav-link').forEach(l=>l.classList.remove('is-active'));
+    if(btn){ btn.classList.add('is-active'); }
+    else {
+      var match = document.querySelector('.nav-link[data-view="'+id+'"]');
+      if(match) match.classList.add('is-active');
+    }
+    window.scrollTo({top:0,behavior:'smooth'});
+  }
+  function openDetail(){
+    document.querySelectorAll('.app-view').forEach(v=>v.classList.remove('active'));
+    document.getElementById('view-detail').classList.add('active');
+    document.querySelectorAll('.nav-link').forEach(l=>l.classList.remove('is-active'));
+    window.scrollTo({top:0,behavior:'smooth'});
+  }
+</script>
+
+</body>
+</html>
