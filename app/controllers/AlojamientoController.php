@@ -188,7 +188,8 @@ class AlojamientoController extends Controller
             exit;
         }
 
-        $exito = $this->alojamientoModel->crearOActualizarResenia($alojamientoId, $usuarioId, $calificacion, $comentario);
+        $alojamientoModel = new Alojamiento();
+        $exito = $alojamientoModel->crearOActualizarResenia($alojamientoId, $usuarioId, $calificacion, $comentario);
 
         if ($exito) {
             echo json_encode(['success' => true, 'message' => '¡Tu reseña ha sido publicada y guardada exitosamente!']);

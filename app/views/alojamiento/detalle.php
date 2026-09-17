@@ -210,7 +210,12 @@ $alojId = htmlspecialchars($a['alojamiento_id']);
             <div class="pd-ficha-section">
                 <h3>Anfitrión</h3>
                 <div class="pd-prop">
-                    <span class="pd-prop-av"><?php echo htmlspecialchars(strtoupper(pd_initial($a['propietario_nombres'] ?? 'A'))); ?></span>
+                    <?php $propFoto = trim($a['propietario_foto'] ?? ''); ?>
+                    <?php if ($propFoto !== ''): ?>
+                        <img class="pd-prop-av" src="<?php echo htmlspecialchars($propFoto, ENT_QUOTES, 'UTF-8'); ?>" alt="" style="object-fit:cover;" onerror="this.style.display='none';var s=document.createElement('span');s.className='pd-prop-av';s.textContent='<?php echo htmlspecialchars(strtoupper(pd_initial($a['propietario_nombres'] ?? 'A')), ENT_QUOTES, 'UTF-8'); ?>';this.parentNode.insertBefore(s,this);">
+                    <?php else: ?>
+                        <span class="pd-prop-av"><?php echo htmlspecialchars(strtoupper(pd_initial($a['propietario_nombres'] ?? 'A'))); ?></span>
+                    <?php endif; ?>
                     <div style="flex:1">
                         <b><?php echo $propNombre; ?></b>
                         <?php if (!empty($a['propietario_verificado'])): ?> <span class="pd-verified"><i class="fas fa-check"></i> Verificado</span><?php endif; ?>

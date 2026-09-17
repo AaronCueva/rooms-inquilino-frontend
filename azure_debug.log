@@ -10,3 +10,23 @@
 [2026-07-12 17:15:40] Archivo leido correctamente. Size: 388212
 [2026-07-12 17:15:40] Usando cURL...
 [2026-07-12 17:15:44] ÉXITO cURL! HTTP 201
+[2026-07-14 21:35:19] Iniciando uploadFile: local=C:\Users\aaron\AppData\Local\Temp\php9481.tmp, dest=verificacion/doc_1d46cc45-5e28-48f1-a097-40edf3fc3707_1784064919.jpg, mime=image/jpeg
+[2026-07-14 21:35:19] Archivo leido correctamente. Size: 4424
+[2026-07-14 21:35:19] Usando cURL...
+[2026-07-14 21:35:20] ÉXITO cURL! HTTP 201
+[2026-07-14 21:48:40] Iniciando uploadFile: local=C:\Users\aaron\AppData\Local\Temp\phpD3A3.tmp, dest=usuarios/perfil_1d46cc45-5e28-48f1-a097-40edf3fc3707_1784065720.jpg, mime=image/jpeg
+[2026-07-14 21:48:40] Archivo leido correctamente. Size: 59321
+[2026-07-14 21:48:40] Usando cURL...
+[2026-07-14 21:48:41] ÉXITO cURL! HTTP 201
+[2026-07-16 18:44:32] Iniciando uploadFile: local=C:\Users\aaron\AppData\Local\Temp\php41E5.tmp, dest=verificacion/doc_f42fb816-a928-4971-8898-ad0528bc4809_1784227472.pdf, mime=application/pdf
+[2026-07-16 18:44:32] Archivo leido correctamente. Size: 106923
+[2026-07-16 18:44:32] Usando cURL...
+[2026-07-16 18:44:33] ÉXITO cURL! HTTP 201
+[2026-07-16 18:46:34] Iniciando uploadFile: local=C:\Users\aaron\AppData\Local\Temp\php2115.tmp, dest=usuarios/perfil_f42fb816-a928-4971-8898-ad0528bc4809_1784227594.png, mime=image/png
+[2026-07-16 18:46:34] Archivo leido correctamente. Size: 104474
+[2026-07-16 18:46:34] Usando cURL...
+[2026-07-16 18:46:35] ÉXITO cURL! HTTP 201
+[2026-07-16 19:19:17] Iniciando uploadFile: local=C:\Users\aaron\AppData\Local\Temp\phpE67.tmp, dest=verificacion/doc_868ea43f-ed33-4e0e-9735-8f59715462e7_1784229557.pdf, mime=application/pdf
+[2026-07-16 19:19:17] Archivo leido correctamente. Size: 83612
+[2026-07-16 19:19:17] Usando cURL...
+[2026-07-16 19:19:20] ÉXITO cURL! HTTP 201

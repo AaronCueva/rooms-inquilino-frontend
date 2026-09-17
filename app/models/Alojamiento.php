@@ -168,7 +168,19 @@ class Alojamiento
         $offset = max(0, ($pagina - 1) * $porPagina);
         $sql = "SELECT r.resenia_alojamiento_id, r.calificacion, r.comentario, r.respuesta_propietario, r.creado,
                        u.nombres AS estudiante_nombres, u.apellido_paterno AS estudiante_apellido,
-                       u.url_foto AS estudiante_foto
+                       u.url_foto AS estudiante_foto,
+                       (EXISTS (
+                            SELECT 1 FROM contrato c
+                            JOIN reserva rv2 ON c.reserva_id = rv2.reserva_id
+                            WHERE rv2.alojamiento_id = r.alojamiento_id
+                              AND rv2.usuario_id = r.estudiante_id
+                              AND c.estado_codigo IN ('ESCO001','ESCO002')
+                       ) OR EXISTS (
+                            SELECT 1 FROM reserva rv
+                            WHERE rv.alojamiento_id = r.alojamiento_id
+                              AND rv.usuario_id = r.estudiante_id
+                              AND rv.estado_codigo IN ('ESRE002','ESRE006','ESRE004')
+                       )) AS verificado
                 FROM resenia_alojamiento r
                 JOIN usuario u ON r.estudiante_id = u.usuario_id
                 WHERE r.alojamiento_id = :id AND r.estado_codigo = 'ESRA001' AND r.habilitado = true
@@ -376,13 +388,19 @@ class Alojamiento
 
     /**
      * Verifica si un estudiante tiene o ha tenido contrato/reserva en el alojamiento.
+     *
+     * contrato se vincula al alojamiento+inquilino a través de reserva (reserva_id).
+     * Estados válidos: contrato ESCO001/ESCO002 (ACTIVO/FINALIZADO),
+     * reserva ESRE002/ESRE006/ESRE004 (APROBADA/FORMALIZADO/FINALIZADA).
      */
     public function verificarEstudianteResidente(string $alojamientoId, string $usuarioId): bool
     {
         try {
-            $sql = "SELECT 1 FROM contrato 
-                    WHERE alojamiento_id = :aid AND inquilino_id = :uid 
-                      AND estado_contrato_id IN ('ESCT001', 'ESCT002', 'ESCT003', 'ACTIVO', 'COMPLETADO') 
+            $sql = "SELECT 1
+                    FROM contrato c
+                    JOIN reserva rv ON c.reserva_id = rv.reserva_id
+                    WHERE rv.alojamiento_id = :aid AND rv.usuario_id = :uid
+                      AND c.estado_codigo IN ('ESCO001', 'ESCO002')
                     LIMIT 1";
             $stmt = $this->db->prepare($sql);
             $stmt->execute([':aid' => $alojamientoId, ':uid' => $usuarioId]);
@@ -390,10 +408,10 @@ class Alojamiento
                 return true;
             }
 
-            // Fallback: verificar si tiene reserva aprobada
-            $sqlRes = "SELECT 1 FROM reserva 
-                       WHERE alojamiento_id = :aid AND usuario_id = :uid 
-                         AND estado_reserva_id IN ('ESRS002', 'APROBADA') 
+            // Fallback: reserva aprobada/formalizada/finalizada
+            $sqlRes = "SELECT 1 FROM reserva
+                       WHERE alojamiento_id = :aid AND usuario_id = :uid
+                         AND estado_codigo IN ('ESRE002', 'ESRE006', 'ESRE004')
                        LIMIT 1";
             $stmtRes = $this->db->prepare($sqlRes);
             $stmtRes->execute([':aid' => $alojamientoId, ':uid' => $usuarioId]);
@@ -404,54 +422,74 @@ class Alojamiento
     }
 
     /**
-     * Crea o actualiza una reseña del usuario sobre un alojamiento.
+     * Crea o actualiza una reseña del estudiante sobre un alojamiento.
+     *
+     * Tabla real: resenia_alojamiento (uuid PK autogenerado, FKs a alojamiento y
+     * usuario). El estado visible es 'ESRA001' y habilitado=true. Una reseña por
+     * (alojamiento, estudiante): si ya existe, se actualiza en lugar de duplicar.
      */
     public function crearOActualizarResenia(string $alojamientoId, string $usuarioId, int $calificacion, string $comentario): bool
     {
         try {
-            // Verificar si ya existe
-            $stmtCheck = $this->db->prepare("SELECT resena_id FROM resena WHERE alojamiento_id = :aid AND usuario_id = :uid LIMIT 1");
+            // ¿Ya existe una reseña de este estudiante para este alojamiento?
+            $stmtCheck = $this->db->prepare(
+                "SELECT resenia_alojamiento_id FROM resenia_alojamiento
+                 WHERE alojamiento_id = :aid AND estudiante_id = :uid LIMIT 1"
+            );
             $stmtCheck->execute([':aid' => $alojamientoId, ':uid' => $usuarioId]);
             $existente = $stmtCheck->fetch(PDO::FETCH_ASSOC);
 
-            $esVerificado = $this->verificarEstudianteResidente($alojamientoId, $usuarioId) ? 'true' : 'false';
+            // propietario_id del alojamiento (nullable en la tabla, pero lo seteamos si existe)
+            $stmtProp = $this->db->prepare("SELECT usuario_id FROM alojamiento WHERE alojamiento_id = :aid LIMIT 1");
+            $stmtProp->execute([':aid' => $alojamientoId]);
+            $propId = $stmtProp->fetchColumn() ?: null;
 
             if ($existente) {
-                // Actualizar
-                $sql = "UPDATE resena 
-                        SET calificacion = :calif, comentario = :coment, modificado = NOW() 
-                        WHERE resena_id = :rid";
+                $sql = "UPDATE resenia_alojamiento
+                        SET calificacion = :calif,
+                            comentario = :coment,
+                            estado_codigo = 'ESRA001',
+                            habilitado = true,
+                            modificado = NOW()
+                        WHERE resenia_alojamiento_id = :rid";
                 $stmt = $this->db->prepare($sql);
                 $stmt->execute([
                     ':calif'  => $calificacion,
                     ':coment' => $comentario,
-                    ':rid'    => $existente['resena_id']
+                    ':rid'    => $existente['resenia_alojamiento_id']
                 ]);
             } else {
-                // Insertar nueva reseña
-                $resenaId = 'RES' . strtoupper(substr(md5(uniqid('', true)), 0, 7));
-                $sql = "INSERT INTO resena (resena_id, alojamiento_id, usuario_id, calificacion, comentario, verificado, creado)
-                        VALUES (:rid, :aid, :uid, :calif, :coment, {$esVerificado}, NOW())";
+                // PK uuid autogenerada → no se setea resenia_alojamiento_id
+                $sql = "INSERT INTO resenia_alojamiento
+                            (alojamiento_id, estudiante_id, propietario_id, calificacion,
+                             comentario, estado_codigo, habilitado, creado, creado_por)
+                        VALUES (:aid, :uid, :pid, :calif, :coment, 'ESRA001', true, NOW(), :uid)";
                 $stmt = $this->db->prepare($sql);
                 $stmt->execute([
-                    ':rid'    => $resenaId,
                     ':aid'    => $alojamientoId,
                     ':uid'    => $usuarioId,
+                    ':pid'    => $propId,
                     ':calif'  => $calificacion,
                     ':coment' => $comentario
                 ]);
             }
 
-            // Actualizar la calificación del alojamiento si existen las columnas correspondientes
+            // Recalcular calificación promedio del alojamiento (solo reseñas visibles).
             try {
-                $sqlAvg = "UPDATE alojamiento 
-                           SET calificacion = (SELECT ROUND(AVG(calificacion)::numeric, 1) FROM resena WHERE alojamiento_id = :aid),
-                               resenas_count = (SELECT COUNT(*) FROM resena WHERE alojamiento_id = :aid2)
-                           WHERE alojamiento_id = :aid3";
+                $sqlAvg = "UPDATE alojamiento
+                           SET calificacion = (
+                                SELECT ROUND(AVG(calificacion)::numeric, 1)
+                                FROM resenia_alojamiento
+                                WHERE alojamiento_id = :aid
+                                  AND estado_codigo = 'ESRA001'
+                                  AND habilitado = true
+                           )
+                           WHERE alojamiento_id = :aid2";
                 $stmtAvg = $this->db->prepare($sqlAvg);
-                $stmtAvg->execute([':aid' => $alojamientoId, ':aid2' => $alojamientoId, ':aid3' => $alojamientoId]);
+                $stmtAvg->execute([':aid' => $alojamientoId, ':aid2' => $alojamientoId]);
             } catch (\Exception $exAvg) {
-                // Si alguna columna no existe en alojamiento, ignoramos el error de actualización agregada
+                // Si alojamiento.calificacion no existiera, ignoramos el error de agregación.
+                error_log("Aviso: no se pudo recalcular calificacion de alojamiento: " . $exAvg->getMessage());
             }
 
             return true;
