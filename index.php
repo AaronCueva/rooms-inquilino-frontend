@@ -2,38 +2,48 @@
 session_start(); // Iniciar sesión al inicio de la aplicación
 
 // Auto-carga de clases
+
 spl_autoload_register(function ($class) {
-    // Ejemplo de clase: App\Core\Router -> app/core/Router.php
     $prefix = 'App\\';
     $base_dir = __DIR__ . '/app/';
 
     $len = strlen($prefix);
+
     if (strncmp($prefix, $class, $len) !== 0) {
         return;
     }
 
     $relative_class = substr($class, $len);
-    $file = $base_dir . str_replace('\\', '/', $relative_class) . '.php';
 
-    // Convertir a minúsculas las carpetas (ej: Core -> core), asumiendo estructura de directorios en minúscula
-    $parts = explode('/', $relative_class);
+    // Separar el namespace usando barras invertidas.
+    $parts = explode('\\', $relative_class);
+
     $className = array_pop($parts);
-    $dirPath = strtolower(implode('/', $parts));
-    
-    $file = $base_dir . ($dirPath ? $dirPath . '/' : '') . $className . '.php';
 
-    if (file_exists($file)) {
-        require $file;
+    // Las carpetas se mantienen en minúsculas.
+    $dirPath = strtolower(implode('/', $parts));
+
+    $file = $base_dir
+        . ($dirPath !== '' ? $dirPath . '/' : '')
+        . $className
+        . '.php';
+
+    if (is_file($file)) {
+        require_once $file;
     }
 });
+
 
 use App\Core\Router;
 
 // Helper: primera letra UTF-8 segura (mbstring puede no estar cargado en CLI)
 if (!function_exists('pd_initial')) {
-    function pd_initial($s) {
-        $s = (string)($s ?? '');
-        if (function_exists('mb_substr')) { return mb_substr($s, 0, 1); }
+    function pd_initial($s)
+    {
+        $s = (string) ($s ?? '');
+        if (function_exists('mb_substr')) {
+            return mb_substr($s, 0, 1);
+        }
         return preg_match('/^./u', $s, $m) ? $m[0] : substr($s, 0, 1);
     }
 }

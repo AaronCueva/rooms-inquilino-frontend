@@ -1,0 +1,9 @@
+
+RewriteEngine On
+
+# Si el archivo o directorio existe, Apache lo sirve normalmente.
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+
+# Las demás solicitudes pasan al router PHP.
+RewriteRule ^ index.php [QSA,L]
